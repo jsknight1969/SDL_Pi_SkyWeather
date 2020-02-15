@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #
 # SkyWeather Solar Powered Weather Station
 # February 2019
