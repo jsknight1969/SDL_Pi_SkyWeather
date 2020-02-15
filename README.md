@@ -183,80 +183,86 @@ cd /home/pi/SDL_Pi_SkyWeather <BR>
 nohup sudo python SkyWeather.py & <BR>
 
 
---------------------<BR>
- Run skyweather.py as a service
- Thanks to user WBP on forum.switchdoc.com for these instructions
- -------------------<BR>
- I've always used a script in /etc/init.d for things that need to be run at boot, rather than making changes to /etc/rc.boot.  There are some advantages to doing it this way.  For example, you can enter this command to start SkyWeather:
-  sudo /etc/init.d/skyweather start
-and this command to stop it:
-  sudo /etc/init.d/skyweather stop
+--------------------<BR>  
+ # Run skyweather.py as a service  
+ Thanks to user WBP on forum.switchdoc.com for these instructions  
+-------------------<BR>  
+ I've always used a script in /etc/init.d for things that need to be run at boot, rather than making changes to /etc/rc.boot.  There are some advantages to doing it this way.  For example, you can enter this command to start SkyWeather:  
+
+    sudo /etc/init.d/skyweather start  
+
+and this command to stop it:  
+
+    sudo /etc/init.d/skyweather stop  
 
 In my startup script I also gave the output file a name with the date in it.  This way there is a new file each time SkyWeather is started, and you can easily purge the older ones.  You *really* do NOT want to let nohup.out get so big it fills up the file system - it can be a real pain dealing with a Linux system where the file system is completely full.
 
-Here's how to do this:
+Here's how to do this:  
 
-1) It's easier to do this if you modify SkyWeather.py so it can be run without typing "python".  Insert this as the first line:
+1) It's easier to do this if you modify SkyWeather.py so it can be run without typing "python".  Insert this as the first line:  
 
-#!/usr/bin/python
+    #!/usr/bin/python  
 
-Then make it executable:
+Then make it executable:  
 
-sudo chmod +x SkyWeather.py
+    sudo chmod +x SkyWeather.py  
 
-  
-2) Now create a new script in /etc/init.d
+2) Now create a new script in /etc/init.d  
 
-sudo nano /etc/init.d/skyweather
-
-
-#! /bin/sh
-# /etc/init.d/skyweather
-
-### BEGIN INIT INFO
-# Provides: SkyWeather
-# Required-Start: $local_fs $remote_fs $syslog $time
-# Required-Stop: $local_fs $remote_fs $syslog
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
-# Short-Description: start SkyWeather from boot
-# Description: A simple script which will start a program from boot and stop upon shut-down
-### END INIT INFO
-
-# Put any commands you always want to run here.
-
-TIME=`date +"%y%m%d.%H%M"` # get a date/timestamp
-DATE=`date +"%y%m%d"` # get a datestamp
-echo $TIME
-case "$1" in
-start)
-echo "Starting SkyWeather"
-# run the program you want to start
-cd /home/pi/SDL_Pi_SkyWeather
-pigpiod
-./SkyWeather.py >> skyweather.$DATE.log &
-chgrp pi skyweather.$DATE.log
-;;
-stop)
-echo "Stopping SkyWeather"
-# end the program you want to stop
-killall "SkyWeather.py"
-;;
-*)
-echo "Usage: /etc/init.d/skyweather {start|stop}"
-exit 1
-;;
-esac
+    sudo nano /etc/init.d/skyweather
 
 
 
+    #!/bin/sh
+    #/etc/init.d/skyweather
+    
+    ###BEGIN INIT INFO  
+    #Provides: SkyWeather  
+    #Required-Start: $local_fs $remote_fs $syslog $time  
+    #Required-Stop: $local_fs $remote_fs $syslog  
+    #Default-Start: 2 3 4 5  
+    #Default-Stop: 0 1 6  
+    #Short-Description: start SkyWeather from boot  
+    #Description: A simple script which will start a program from boot and stop upon shut-down  
+    ###END INIT INFO  
 
-3) Make the script executable:
-  sudo chmod +x /etc/init.d/skyweather
-4) Tell the init system about it:
-  sudo update-rc.d skyweather defaults
+    #Put any commands you always want to run here.  
 
-That's it!  Don't forget to remove the changes from /etc/rc.boot.
+    TIME=`date +"%y%m%d.%H%M"` # get a date/timestamp    
+    DATE=`date +"%y%m%d"` # get a datestamp  
+    echo $TIME  
+    case `"$1"` in  
+        start)  
+            echo "Starting SkyWeather"  
+            #run the program you want to start  
+            cd /home/pi/SDL_Pi_SkyWeather  
+            pigpiod  
+            ./SkyWeather.py >> skyweather.$DATE.log &  
+            chgrp pi skyweather.$DATE.log  
+        ;;  
+        stop)  
+            echo "Stopping SkyWeather"  
+            #end the program you want to stop  
+            killall "SkyWeather.py"  
+        ;;  
+    *)  
+    echo "Usage: /etc/init.d/skyweather {start|stop}"  
+    exit 1  
+    ;;  
+    esac  
+
+
+
+
+3) Make the script executable:  
+
+    sudo chmod +x /etc/init.d/skyweather  
+
+4) Tell the init system about it:  
+
+    sudo update-rc.d skyweather defaults  
+
+That's it!  Don't forget to remove the changes from /etc/rc.boot.  
 
 
 
