@@ -373,7 +373,7 @@ def blynkStateUpdate():
 
 
 
-        if (state.currentAs3935LastLightningTimeStamp < time.clock() + 1800):   #True is lightning, False is none
+        if (state.currentAs3935LastLightningTimeStamp > time.clock() + 1800):   #True is lightning, False is none
                         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?color=%2300FF00') # Green
                         if (DEBUGBLYNK):
                             print "blynkAlarmUpdate:OTHER:r.status_code:",r.status_code

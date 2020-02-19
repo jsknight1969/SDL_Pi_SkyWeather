@@ -15,7 +15,7 @@ try:
 except ImportError:
 	import config
 
-config.SWVERSION = "055"
+config.SWVERSION = "055-KIWK"
 
 
 import sys
@@ -1291,7 +1291,7 @@ def sampleAndDisplay():
 
         sampleWeather()
 
-        state.pastBarometricReading = state.currentBarometricPressure
+        #state.pastBarometricReading = state.currentBarometricPressure
 
         if (config.OLED_Present):
                 Scroll_SSD1306.addLineOLED(display,  ("Wind Speed=\t%0.2f MPH")%(currentWindSpeed/1.6))
