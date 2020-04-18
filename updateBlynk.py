@@ -188,8 +188,6 @@ def blynkStateUpdate():
             print "blynkEventUpdate:POST:r.status_code:",r.status_code
 
         # do the graphs
-
-
         val = state.Outdoor_AirQuality_Sensor_Value 
         put_body = json.dumps([val])
         if (DEBUGBLYNK):
@@ -198,42 +196,35 @@ def blynkStateUpdate():
         if (DEBUGBLYNK):
             print "blynkStateUpdate:POST:r.status_code:",r.status_code
     
-
-        val = util.returnTemperatureCF(state.currentOutsideTemperature)
-        tval = "{0:0.1f} ".format(val) + util.returnTemperatureCFUnit()
-        put_body = json.dumps([tval])
-        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V0', data=put_body, headers=put_header)
-
+        #Outside Temperature
         val = util.returnTemperatureCF(state.currentOutsideTemperature)
         put_body = json.dumps([val])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V10', data=put_body, headers=put_header)
-
+        put_body = json.dumps("{0:0.1f} ".format(val) + util.returnTemperatureCFUnit())
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V0', data=put_body, headers=put_header)
+        
+        #Outside Humidity
         val = state.currentOutsideHumidity 
         put_body = json.dumps(["{0:0.1f}%".format(val)])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V1', data=put_body, headers=put_header)
-
-        val = state.currentOutsideHumidity 
         put_body = json.dumps([val])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V11', data=put_body, headers=put_header)
 
+        #Current Inside Temperature
         val = util.returnTemperatureCF(state.currentInsideTemperature)
-        tval = "{0:0.1f} ".format(val) + util.returnTemperatureCFUnit()
-        put_body = json.dumps([tval])
+        put_body = json.dumps("{0:0.1f} ".format(val) + util.returnTemperatureCFUnit())
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V21', data=put_body, headers=put_header)
-
-        val = util.returnTemperatureCF(state.currentInsideTemperature)
-        tval = "{0:0.1f}".format(val) 
-        put_body = json.dumps([val])
+        put_body = json.dumps("{0:0.1f}".format(val))
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V120', data=put_body, headers=put_header)
 
+        #Current Inside Humidity        
         val = state.currentInsideHumidity 
         put_body = json.dumps(["{0:0.1f}%".format(val)])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V13', data=put_body, headers=put_header)
-
-        val = state.currentInsideHumidity 
         put_body = json.dumps(["{0:0.1f}".format(val)])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V121', data=put_body, headers=put_header)
 
+        #Fan
         if (state.fanState == False):
             val = 0
         else:
@@ -241,29 +232,37 @@ def blynkStateUpdate():
         put_body = json.dumps([val])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V122', data=put_body, headers=put_header)
 
-
         #wind
         val = util.returnWindSpeed(state.ScurrentWindSpeed)
         tval = "{0:0.1f}".format(val) + util.returnWindSpeedUnit()
         put_body = json.dumps([tval])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V9', data=put_body, headers=put_header)
-
-        #now humiidyt
-        #val = util.returnWindSpeed(state.ScurrentWindSpeed)
-        val = state.currentOutsideHumidity
-        put_body = json.dumps([val])
-        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V19', data=put_body, headers=put_header)
-
-        # outdoor Air Quality
-        val = state.Outdoor_AirQuality_Sensor_Value 
-        put_body = json.dumps([val])
-        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V20', data=put_body, headers=put_header)
         
         #wind direction
         val = "{0:0.0f}/".format(state.ScurrentWindDirection) + util.returnWindDirection(state.ScurrentWindDirection)
         put_body = json.dumps([val])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V2', data=put_body, headers=put_header)
 
+        #now humiidyt
+        #val = util.returnWindSpeed(state.ScurrentWindSpeed)
+        #val = state.currentOutsideHumidity
+        #put_body = json.dumps([val])
+        #r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V19', data=put_body, headers=put_header)
+
+        #dewpoint
+        val =  util.returnTemperatureCF(state.currentOutsideTemperature) - ((100.0 - state.currentOutsideHumidity) / 5.0);
+        put_body = json.dumps([val])
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V5', data=put_body, headers=put_header)
+        tval = "{0:0.1f} ".format(val) + util.returnTemperatureCFUnit()
+        put_body = json.dumps([tval])
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V15', data=put_body, headers=put_header)
+
+        # outdoor Air Quality
+        val = state.Outdoor_AirQuality_Sensor_Value 
+        put_body = json.dumps([val])
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V20', data=put_body, headers=put_header)
+        
+        
         #rain 
         val = "{0:0.2f}".format(state.currentTotalRain) 
         if (state.EnglishMetric == 1):
@@ -296,7 +295,6 @@ def blynkStateUpdate():
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V41', data=put_body, headers=put_header)
 
         #solar data
-
         val = "{0:0.2f}".format(state.solarVoltage) 
         put_body = json.dumps([val])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V50', data=put_body, headers=put_header)
@@ -355,22 +353,18 @@ def blynkStateUpdate():
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V127', data=put_body, headers=put_header)
         
         delta = util.returnTemperatureCF(state.currentInsideTemperature)- util.returnTemperatureCF(state.currentOutsideTemperature)
-        
         val = "{0:0.1f}".format(delta) 
         put_body = json.dumps([val])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V128', data=put_body, headers=put_header)
         
         
         # LEDs 
-
-
         if (state.barometricTrend):   #True is up, False is down
                         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?color=%2300FF00') # Green
                         if (DEBUGBLYNK):
                             print "blynkAlarmUpdate:OTHER:r.status_code:",r.status_code
         else:
                         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?color=%23FF0000') # red
-
 
 
         if (state.currentAs3935LastLightningTimeStamp > time.clock() + 1800):   #True is lightning, False is none
