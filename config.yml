@@ -1,0 +1,84 @@
+# configuration file - contains customization for SkyWeather system
+
+# it is a good idea to copy this file into a file called "conflocal.yml" and edit that instead of this one.  This file is wiped out if you update SkyWeather.
+SWDebug: False
+
+#modify these values to receive alerts via email or sms
+mail:
+    enable: False
+    mailuser: "username"
+    mailpassword: "password"
+    notifyaddress: "you@mailprovider.com"
+    fromaddress: "from@mailprovider.com"
+sms:
+    enable: False
+    textnotifyaddress: "yourphonenumber@smsprovider.com"
+
+#MySQL Logging and Password Information
+mysql: 
+    enable: False
+    username: "username"
+    password: "password"
+
+#WLAN detection
+wlan:
+    enable_wlan_detection: False
+    pingablerouteraddress: "192.168.1.1"
+
+#LED configuration
+runLEDs: false
+
+# WXLink and SolarMAX configuration
+# SolarMAX_Type = "LEAD" for SolarMAX Lead Acid
+# SolarMAX_Type = "LIPO" for SolarMAX LiPo
+SolarMax:
+    enable: False
+    type: "" #"LEAD" for Lead Acid, "LIPO" for LiPo
+
+    Dual_MAX_WXLink: False
+
+# WeatherSTEM configuration
+weatherSTEM:
+    enable: false
+    photo_interval: 60
+    stationmac: ""
+    stationkey: ""
+    stationhardware: ""
+
+# WeatherUnderground Station
+weatherunderground:
+    enable: False
+    StationID: "KWXXXXX"
+    StationKey: "YYYYYY"
+
+#Blynk
+blynk:
+    enable: False
+    auth: "xxxxx"
+    URL: "http://blynk-cloud.com/"
+
+#AS395 lightning configuration
+#format: [NoiseFLoor, Indoor, TuneCap, DisturberDetection, WatchDogThreshold, SpikeDetection]
+AS3935:
+    config: [2,1,3,0,3,3]
+
+# for barometeric pressure - needed to calculate sealevel equivalent
+# set your weatherstation elevation here
+BMP280:
+    altitude: 328.0
+
+# set Sunlight High Gain (indoors - 1) or Low Gain (outdoors - 0)
+Sunlight_Gain : 0
+
+# Pin definitions
+pins:
+    pixel: 21
+    dustsensor: 19
+    dustsensorpower: 26
+    anemometer: 20
+    rain: 13
+    sht30gs: 6
+    am2315gs: 6
+    powerdrive_sig1: 5
+    powerdrive_sig2: 5 # To avoid stepping on GPIO 6 
+    watchdogtrigger: 4

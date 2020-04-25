@@ -8,44 +8,75 @@
 #
 #
 
+
 # imports
 # Check for user imports
 try:
-	import conflocal as config
-except ImportError:
-	import config
+	#read yml file
+	
+except:
+	try:
+		import conflocal as config
+	except ImportError:
+		import config
 
-config.SWVERSION = "055-KIWK"
+config.SWVERSION = "056-KIWK"
 
+#import uuid 
+# printing the value of unique MAC 
+# address using uuid and getnode() function  
+# MACADDRESS = hex(uuid.getnode()) 
 
 import sys
 import time
 import traceback
-
 from datetime import datetime
-
 import random 
 import re
 import math
 import os
 import threading
 import commands
-
 import sendemail
 import logging
-logging.basicConfig()
-
 import pclogging
-
 import updateBlynk
-
 import state
-
+import subprocess
+import RPi.GPIO as GPIO
+import doAllGraphs
+import smbus
+import struct
+import SDL_Pi_HDC1000
+from apscheduler.schedulers.background import BackgroundScheduler
+import apscheduler.events
+if (config.enable_MySQL_Logging == True):
+	import MySQLdb as mdb
+import picamera
+import SkyCamera
+import DustSensor
+import util
+import SDL_Pi_INA3221
+import SDL_DS3231
+import Adafruit_BMP.BMP280 as BMP280
+import SDL_Pi_WeatherRack as SDL_Pi_WeatherRack
+import bme680 as BME680
+import BME680_Functions
+from RPi_AS3935 import RPi_AS3935
+import Adafruit_SSD1306
+import Scroll_SSD1306
+import WeatherUnderground
+import SDL_Pi_SI1145
+import SI1145Lux
+if (config.runLEDs):
+    from neopixel import *
+    import pixelDriver
+import TSL2591
+import SDL_Pi_TCA9545
 
 sys.path.append('./TSL2591')
 sys.path.append('./SDL_Pi_SI1145')
 sys.path.append('./SDL_Pi_TCA9545')
-
 sys.path.append('./SDL_Pi_SSD1306')
 sys.path.append('./Adafruit_Python_SSD1306')
 sys.path.append('./RTC_SDL_DS3231')
@@ -59,42 +90,16 @@ sys.path.append('./SDL_Pi_HDC1000')
 sys.path.append('./SDL_Pi_AM2315')
 sys.path.append('./SDL_Pi_SHT30')
 sys.path.append('./BME680')
-
 sys.path.append('./SDL_Pi_GrovePowerDrive')
 
-import subprocess
-import RPi.GPIO as GPIO
-import doAllGraphs
-import smbus
+logging.basicConfig()
 
-import struct
-
-import SDL_Pi_HDC1000
-
-
-from apscheduler.schedulers.background import BackgroundScheduler
-
-import apscheduler.events
-
-if (config.enable_MySQL_Logging == True):
-	import MySQLdb as mdb
-
-import picamera
-
-import SkyCamera
-
-import DustSensor
-
-import util
+#used to indicate interrupt has happened from as3936
+as3935_Interrupt_Happened = False;
 
 ################
 # Device Present State Variables
 ###############
-
-#indicate interrupt has happened from as3936
-
-as3935_Interrupt_Happened = False;
-
 config.Camera_Present = False
 config.TCA9545_I2CMux_Present = False
 config.SunAirPlus_Present = False
@@ -110,44 +115,15 @@ config.WXLink_Present = False
 config.Sunlight_Present = False
 config.TSL2591_Present = False
 config.SolarMax_Present = False
-
 # if the WXLink has stopped transmitting, == False
 config.WXLink_Data_Fresh = False
 config.WXLink_LastMessageID = 0
-
-import SDL_Pi_INA3221
-import SDL_DS3231
-import Adafruit_BMP.BMP280 as BMP280
-import SDL_Pi_WeatherRack as SDL_Pi_WeatherRack
-import bme680 as BME680
-import BME680_Functions
-
-from RPi_AS3935 import RPi_AS3935
-
-
-import Adafruit_SSD1306
-
-import Scroll_SSD1306
-
-import WeatherUnderground
-
-
-import SDL_Pi_SI1145
-import SI1145Lux
-
-if (config.runLEDs):
-    from neopixel import *
-    import pixelDriver
-
-import TSL2591
-import SDL_Pi_TCA9545
-
-
 ################
 #Establish WeatherSTEMHash
 ################
 if (config.USEWEATHERSTEM == True):
     state.WeatherSTEMHash = SkyCamera.SkyWeatherKeyGeneration(config.STATIONKEY)
+
 
 ################
 # TCA9545 I2C Mux 
