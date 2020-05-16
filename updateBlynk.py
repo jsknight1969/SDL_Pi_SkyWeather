@@ -13,16 +13,15 @@ except ImportError:
                 import config
 
 
-DEBUGBLYNK = False 
+DEBUGBLYNK = config.DEBUGBLYNK
 def stopFlash():
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V30?value=0')
 
 def blynkInit():
     # initalize button states
     try:
-        if (DEBUGBLYNK):
-            print "Entering blynkInit:"
-
+        print "Entering blynkInit debug mode: " + str(DEBUGBLYNK)
+ 
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V5?value=0')
         if (state.runOLED == True):
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V6?value=1')
@@ -234,6 +233,11 @@ def blynkStateUpdate():
         put_body = json.dumps(["{0:0.1f}".format(val)])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V121', data=put_body, headers=put_header)
 
+        dewpoint =  state.currentOutsideTemperature - ((100.0 - state.currentOutsideHumidity) / 5.0)
+        put_body = json.dumps(["{0:0.1f}".format(util.returnTemperatureCF(dewpoint)) + util.returnTemperatureCFUnit()])
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V12', data=put_body, headers=put_header)
+
+
         if (state.fanState == False):
             val = 0
         else:
@@ -272,6 +276,15 @@ def blynkStateUpdate():
             tval = "{0:0.2f}in".format(state.currentTotalRain / 25.4) 
         put_body = json.dumps([tval])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V3', data=put_body, headers=put_header)
+
+ 	#rain last hour
+        val = "{0:0.2f}".format(state.currentRain60Minutes)
+        if (state.EnglishMetric == 1):
+            tval = "{0:0.2f}mm".format(state.currentTotalRain) 
+        else:
+            tval = "{0:0.2f}in".format(state.currentTotalRain / 25.4) 
+        put_body = json.dumps([tval])
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V14', data=put_body, headers=put_header)
 
         #Sunlight 
         val = "{0:0.0f}".format(state.currentSunlightVisible) 

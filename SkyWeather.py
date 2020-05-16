@@ -1786,11 +1786,11 @@ scheduler.add_job(tick, 'interval', seconds=60)
 
 # sample and Watchdog jobs
 
-scheduler.add_job(sampleAndDisplay, 'interval', seconds=30)
+scheduler.add_job(sampleAndDisplay, 'interval', seconds=45)
 scheduler.add_job(patTheDog, 'interval', seconds=10)   # reset the WatchDog Timer
 
 # every minute, check for button changes
-scheduler.add_job(checkForButtons, 'interval', seconds=10)   
+scheduler.add_job(checkForButtons, 'interval', seconds=600)   
 
 if (config.runLEDs):
     # blink optional life light
