@@ -1289,9 +1289,10 @@ def sampleAndDisplay():
 	print " Sample and Display "
 	print "----------------- "
 
-        sampleWeather()
-
-        state.pastBarometricReading = state.currentBarometricPressure
+        
+	state.pastBarometricReading = state.currentBarometricPressure
+	sampleWeather()
+       
 
         if (config.OLED_Present):
                 Scroll_SSD1306.addLineOLED(display,  ("Wind Speed=\t%0.2f MPH")%(currentWindSpeed/1.6))
