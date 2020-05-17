@@ -839,6 +839,8 @@ def writeWeatherStats():
 
 # sample weather 
 totalRain = 0
+rain60Minutes = 0
+
 def sampleWeather():
 
 	global as3935LightningCount
