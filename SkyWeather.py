@@ -1633,6 +1633,7 @@ def updateRain():
 	global lastRainReading, rain60Minutes
 	addRainToArray(totalRain - lastRainReading)	
 	rain60Minutes = totalRainArray()
+	state.currentRain60Minutes = totalRainArray()
 	lastRainReading = totalRain
 
 def statusRain():
@@ -1655,12 +1656,23 @@ def checkForShutdown():
 
 
 def barometricTrend():
-    if (state.currentBarometricPressure >= state.pastBarometricReading):
-        state.barometricTrend = True
-    else:
-        state.barometricTrend = False
+	if (state.currentBarometricPressure == state.pastBarometricReading):
+        	state.barometricTrend = 0
+	elif (state.currentBarometricPressure > state.pastBarometricReading):
+		state.barometricTrend = 1
+	else:
+        	state.barometricTrend = -1
 
-    state.pastBarometricReading = state.currentBarometricPressure
+	state.pastBarometricReading = state.currentBarometricPressure
+
+#def barometricTrend():
+#    print "pastBarometic: ", state.pastBarometricReading 
+#    if (state.currentBarometricPressure >= state.pastBarometricReading):
+#        state.barometricTrend = True
+#    else:
+#        state.barometricTrend = False
+#
+#    state.pastBarometricReading = state.currentBarometricPressure
 
 def checkForButtons():
     reinitializeOLED = False

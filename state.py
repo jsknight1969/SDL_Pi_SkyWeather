@@ -31,7 +31,8 @@ currentTotalRain  = 0
 currentBarometricPressure = 0
 currentAltitude = 0 
 currentSeaLevel = 0
-barometricTrend = True
+#barometricTrend = True
+barometricTrend = 0
 pastBarometricReading = 0
 
 Indoor_AirQuality_Sensor_Value = 0
