@@ -1658,13 +1658,14 @@ def checkForShutdown():
 
 
 def barometricTrend():
+	print "current Trend:", state.barometricTrend
 	if (state.currentBarometricPressure == state.pastBarometricReading):
         	state.barometricTrend = 0
 	elif (state.currentBarometricPressure > state.pastBarometricReading):
-		state.barometricTrend = 1
+			state.barometricTrend = 1
 	else:
-        	state.barometricTrend = -1
-
+        	state.barometricTrend = 2
+	print "new Trend: ", state.barometricTrend
 	state.pastBarometricReading = state.currentBarometricPressure
 
 #def barometricTrend():

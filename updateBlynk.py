@@ -378,17 +378,16 @@ def blynkStateUpdate():
 
         if (DEBUGBLYNK):
             print "BarometricTrend: ", state.barometricTrend
-
             #if (state.barometricTrend):   #True is up, False is down
         if (state.barometricTrend == 0):
-            r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?color=%23FFFFFF') #  White
+            r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?color=%23FFFFFF', timeout=10) #  White
         elif (state.barometricTrend == 1):
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?color=%2300FF00', timeout=10) # Green
-            if (DEBUGBLYNK):
-                print "blynkAlarmUpdate:OTHER:r.status_code:",r.status_code
         else:
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?color=%23FF0000', timeout=10) # red
 
+        if (DEBUGBLYNK):
+                print "blynkBarometricTrendUpdate:OTHER:r.status_code:",r.status_code
 
 
         if (state.currentAs3935LastLightningTimeStamp < time.clock() + 1800):   #True is lightning, False is none
