@@ -15,7 +15,7 @@ try:
 except ImportError:
 	import config
 
-config.SWVERSION = "055"
+config.SWVERSION = "055-sk"
 
 
 import sys
@@ -1602,7 +1602,7 @@ def addRainToArray(plusRain):
 	global rainArray
 	del rainArray[0]
 	rainArray.append(plusRain)
-	#print "rainArray=", rainArray
+	print "rainArray=", rainArray
 
 def totalRainArray():
 	global rainArray
@@ -1633,7 +1633,7 @@ def updateRain():
 	global lastRainReading, rain60Minutes
 	addRainToArray(totalRain - lastRainReading)	
 	rain60Minutes = totalRainArray()
-	state.currentRain60Minutes = totalRainArray()
+	state.currentRain60Minutes = rain60Minutes
 	lastRainReading = totalRain
 
 def statusRain():
