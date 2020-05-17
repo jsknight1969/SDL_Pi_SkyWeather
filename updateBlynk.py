@@ -278,11 +278,11 @@ def blynkStateUpdate():
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V3', data=put_body, headers=put_header, timeout=10)
 
  	#rain last hour
-        val = "{0:0.2f}".format(state.currentRain60Minutes)
+        # val = "{0:0.2f}".format(state.currentRain60Minutes)
         if (state.EnglishMetric == 1):
-            tval = "{0:0.2f}mm".format(val) 
+            tval = "{0:0.2f}mm".format(state.currentRain60Minutes) 
         else:
-            tval = "{0:0.2f}in".format(val / float(25.4)) 
+            tval = "{0:0.2f}in".format(state.currentRain60Minutes / 25.4) 
         put_body = json.dumps([tval])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V14', data=put_body, headers=put_header, timeout=10)
 
