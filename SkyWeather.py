@@ -15,31 +15,30 @@ try:
 except ImportError:
 	import config
 
+import uuid 
+  
+# printing the value of unique MAC 
+# address using uuid and getnode() function  
+MACADDRESS = hex(uuid.getnode()) 
+
+config.STATIONMAC = MACADDRESS
 config.SWVERSION = "055-sk"
 
-
+#system imports
 import sys
 import time
 import traceback
-
 from datetime import datetime
-
 import random 
 import re
 import math
 import os
 import threading
 import commands
-
 import sendemail
 import logging
 logging.basicConfig()
 
-import pclogging
-
-import updateBlynk
-
-import state
 
 
 sys.path.append('./TSL2591')
@@ -59,33 +58,48 @@ sys.path.append('./SDL_Pi_HDC1000')
 sys.path.append('./SDL_Pi_AM2315')
 sys.path.append('./SDL_Pi_SHT30')
 sys.path.append('./BME680')
+sys.path.appent('./MD503')
 
 sys.path.append('./SDL_Pi_GrovePowerDrive')
 
+import pclogging
+import updateBlynk
+import state
 import subprocess
 import RPi.GPIO as GPIO
 import doAllGraphs
 import smbus
-
 import struct
-
-import SDL_Pi_HDC1000
-
-
+import SDL_Pi_HDC1000.SDL_Pi_HDC1000
 from apscheduler.schedulers.background import BackgroundScheduler
-
 import apscheduler.events
-
 if (config.enable_MySQL_Logging == True):
 	import MySQLdb as mdb
-
 import picamera
-
 import SkyCamera
-
 import DustSensor
-
 import util
+import SDL_Pi_INA3221.SDL_Pi_INA3221
+import SDL_DS3231
+import Adafruit_BMP.BMP280 as BMP280
+import SDL_Pi_WeatherRack as SDL_Pi_WeatherRack
+import bme680 as BME680
+import BME680_Functions
+from RPi_AS3935 import RPi_AS3935
+import Adafruit_SSD1306
+import Scroll_SSD1306
+import WeatherUnderground
+import SDL_Pi_SI1145
+import SI1145Lux
+if (config.runLEDs):
+    from neopixel import *
+    import pixelDriver
+import TSL2591.TSL2591
+import SDL_Pi_TCA9545.SDL_Pi_TCA9545
+import MP503.AirQualitySensorLibrary as AirQualitySensorLibrary
+from MP503.MADS1x15 import ADS1x15
+import SDL_Pi_GrovePowerDrive.SDL_Pi_GrovePowerDrive
+
 
 ################
 # Device Present State Variables
@@ -93,7 +107,7 @@ import util
 
 #indicate interrupt has happened from as3936
 
-as3935_Interrupt_Happened = False;
+as3935_Interrupt_Happened = False
 
 config.Camera_Present = False
 config.TCA9545_I2CMux_Present = False
@@ -110,37 +124,13 @@ config.WXLink_Present = False
 config.Sunlight_Present = False
 config.TSL2591_Present = False
 config.SolarMax_Present = False
+config.MD503_Present = False
 
 # if the WXLink has stopped transmitting, == False
 config.WXLink_Data_Fresh = False
 config.WXLink_LastMessageID = 0
 
-import SDL_Pi_INA3221
-import SDL_DS3231
-import Adafruit_BMP.BMP280 as BMP280
-import SDL_Pi_WeatherRack as SDL_Pi_WeatherRack
-import bme680 as BME680
-import BME680_Functions
 
-from RPi_AS3935 import RPi_AS3935
-
-
-import Adafruit_SSD1306
-
-import Scroll_SSD1306
-
-import WeatherUnderground
-
-
-import SDL_Pi_SI1145
-import SI1145Lux
-
-if (config.runLEDs):
-    from neopixel import *
-    import pixelDriver
-
-import TSL2591
-import SDL_Pi_TCA9545
 
 
 ################
@@ -209,9 +199,6 @@ def togglePower(GroveSavePin):
 ###############
 # Fan Control
 ###############
-
-import SDL_Pi_GrovePowerDrive
-
 TEMPFANTURNON = 37.0
 TEMPFANTURNOFF = 34.0
 
@@ -277,25 +264,25 @@ if (config.TCA9545_I2CMux_Present):
 	 tca9545.write_control_register(TCA9545_CONFIG_BUS3)
 
 try:
-        #restorePower(SI1145GSPIN)
-        time.sleep(1.0)
+	#restorePower(SI1145GSPIN)
+	time.sleep(1.0)
 	Sunlight_Sensor = SDL_Pi_SI1145.SDL_Pi_SI1145(indoor=0)
-        time.sleep(1.0)
+	time.sleep(1.0)
 
-        visible = Sunlight_Sensor.readVisible() 
-        print "visible=", visible
-        config.Sunlight_Present = True
-        vis = Sunlight_Sensor.readVisible()
-       	IR = Sunlight_Sensor.readIR()
-       	UV = Sunlight_Sensor.readUV()
-       	IR_Lux = SI1145Lux.SI1145_IR_to_Lux(IR)
-       	vis_Lux = SI1145Lux.SI1145_VIS_to_Lux(vis)
-       	uvIndex = UV / 100.0
-        if (visible == 0):
-            time.sleep(1.0)
-	    Sunlight_Sensor = SDL_Pi_SI1145.SDL_Pi_SI1145(indoor=0)
-            time.sleep(1.0)
-        time.sleep(1.0)
+	visible = Sunlight_Sensor.readVisible() 
+	print "visible=", visible
+	config.Sunlight_Present = True
+	vis = Sunlight_Sensor.readVisible()
+	IR = Sunlight_Sensor.readIR()
+	UV = Sunlight_Sensor.readUV()
+	IR_Lux = SI1145Lux.SI1145_IR_to_Lux(IR)
+	vis_Lux = SI1145Lux.SI1145_VIS_to_Lux(vis)
+	uvIndex = UV / 100.0
+	if (visible == 0):
+		time.sleep(1.0)
+		Sunlight_Sensor = SDL_Pi_SI1145.SDL_Pi_SI1145(indoor=0)
+		time.sleep(1.0)
+	time.sleep(1.0)
 
 
 
@@ -452,7 +439,7 @@ try:
     if state.ll.setOpModeSleep(True,True):
 	state.ll.setFiFo()
 	state.ll.setOpModeIdle()
-        state.ll.setModemConfig('Bw31_25Cr48Sf512');
+        state.ll.setModemConfig('Bw31_25Cr48Sf512')
 	#state.ll.setModemConfig('Bw125Cr45Sf128');
 	#state.ll.setPreambleLength(8)
 	state.ll.setFrequency(434.0)
@@ -660,10 +647,11 @@ try:
                 print "as3935 present at 0x02"
 		#process_as3935_interrupt()
                 if (config.TCA9545_I2CMux_Present):
-         	    tca9545.write_control_register(TCA9545_CONFIG_BUS1)
+         	    	tca9545.write_control_register(TCA9545_CONFIG_BUS1)
 
 except IOError as e:
                 print "I/O error({0}): {1}".format(e.errno, e.strerror)
+
         	as3935 = RPi_AS3935(address=0x03, bus=1)
 
         	try:
@@ -692,6 +680,19 @@ if (config.TCA9545_I2CMux_Present):
         	 tca9545.write_control_register(TCA9545_CONFIG_BUS0)
 time.sleep(0.003)
 
+# Initialise the ADC using the default mode (use default I2C address)
+ADS1115 = 0x01	# 16-bit ADC
+ads1115 = ADS1x15(ic=ADS1115)
+
+try:
+	print"------------------------------"
+	sensor_value =  AirQualitySensorLibrary.readAirQualitySensor(ads1115)
+	sensorList = AirQualitySensorLibrary.interpretAirQualitySensor(sensor_value)
+	print "Sensor Value=%i --> %s  | %i"% (sensor_value, sensorList[0], sensorList[1])
+	config.MP503 = True
+except:
+	print "MP503 not found"
+	config.MP503 = False
 
 
 
@@ -844,18 +845,14 @@ rain60Minutes = 0
 def sampleWeather():
 
 	global as3935LightningCount
-    	global as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus
+	global as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus
  	global currentWindSpeed, currentWindGust, totalRain 
-  	global 	bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel 
-    	global outsideTemperature, outsideHumidity, crc_check 
+  	global bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel 
+	global outsideTemperature, outsideHumidity, crc_check 
 	global currentWindDirection, currentWindDirectionVoltage
-
-        global	SunlightVisible, SunlightIR, SunlightUV,  SunlightUVIndex 
-
+	global SunlightVisible, SunlightIR, SunlightUV,  SunlightUVIndex 
 	global HTUtemperature, HTUhumidity, rain60Minutes
-
-
-        global am2315
+	global am2315
 
 
 
@@ -1146,6 +1143,12 @@ def sampleWeather():
 	                if (config.SWDEBUG == True):
                             print "SHT30 Stats: (g,br,bc,rt,pc)", sht30.read_status_info()
 
+	if (config.MP503):
+		sensor_value =  AirQualitySensorLibrary.readAirQualitySensor(ads1115)
+		sensorList = AirQualitySensorLibrary.interpretAirQualitySensor(sensor_value)
+		state.Outdoor_AirQuality_Sensor_Value = sensor_value
+
+
 	if (config.WeatherUnderground_Present == True):
 
 		if (config.WXLink_Present):
@@ -1275,11 +1278,8 @@ def sampleAndDisplay():
     global  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel
     global outsideTemperature, outsideHumidity, crc_check
     global currentWindDirection, currentWindDirectionVoltage
-
     global HTUtemperature, HTUhumidity
-
     global	SunlightVisible, SunlightIR, SunlightUV,  SunlightUVIndex 
-
     global totalRain, as3935LightningCount
     global as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus
 
@@ -1292,7 +1292,7 @@ def sampleAndDisplay():
 	print "----------------- "
 
         
-	state.pastBarometricReading = state.currentBarometricPressure
+	#state.pastBarometricReading = state.currentBarometricPressure
 	sampleWeather()
        
 
@@ -1387,14 +1387,12 @@ def sampleAndDisplay():
 
 def writeWeatherRecord():
 	global as3935LightningCount
-    	global as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus
+	global as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus
  	global currentWindSpeed, currentWindGust, totalRain 
-  	global 	bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel 
-    	global outsideTemperature, outsideHumidity, crc_check 
+  	global bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel 
+	global outsideTemperature, outsideHumidity, crc_check 
 	global currentWindDirection, currentWindDirectionVoltage
-
-        global	SunlightVisible, SunlightIR, SunlightUV,  SunlightUVIndex 
-
+	global SunlightVisible, SunlightIR, SunlightUV,  SunlightUVIndex 
 	global HTUtemperature, HTUhumidity
 
 
@@ -1456,28 +1454,22 @@ def writePowerRecord():
 
 	try:
 		print("trying database")
-    		con = mdb.connect('localhost', 'root', config.MySQL_Password, 'SkyWeather');
-
-    		cur = con.cursor()
+		con = mdb.connect('localhost', 'root', config.MySQL_Password, 'SkyWeather')
+		cur = con.cursor()
 		print "before query"
-
-                if (config.SolarMAX_Present == True):
-		        query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (state.batteryVoltage, state.batteryCurrent, state.solarVoltage, state.solarCurrent, state.loadVoltage, state.loadCurrent, state.batteryPower, state.solarPower, state.loadPower, state.batteryCharge) 
-                else:
+		if (config.SolarMAX_Present == True):
+			query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (state.batteryVoltage, state.batteryCurrent, state.solarVoltage, state.solarCurrent, state.loadVoltage, state.loadCurrent, state.batteryPower, state.solarPower, state.loadPower, state.batteryCharge) 
+		else:
+				if (config.SunAirPlus_Present == False):
+					if (config.WXLink_Present):
+						query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (state.WXbatteryVoltage, state.WXbatteryCurrent, state.WXsolarVoltage, state.WXsolarCurrent, state.WXloadVoltage, state.WXloadCurrent, state.WXbatteryPower, state.WXsolarPower, state.WXloadPower, state.WXbatteryCharge) 
+					else:
+						query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) 
+				else:
+					query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) 
 		
-                  if (config.SunAirPlus_Present == False):
-                    if (config.WXLink_Present):
-		        query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (state.WXbatteryVoltage, state.WXbatteryCurrent, state.WXsolarVoltage, state.WXsolarCurrent, state.WXloadVoltage, state.WXloadCurrent, state.WXbatteryPower, state.WXsolarPower, state.WXloadPower, state.WXbatteryCharge) 
-	            else:
-		        query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) 
-                  else:
-		    query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (UTC_TIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) 
-                
 		print("query=%s" % query)
-                
-
 		cur.execute(query)
-	
 		con.commit()
 		
 	except mdb.Error, e:
@@ -1595,7 +1587,7 @@ def WLAN_check():
 #Rain calculations
 
 rainArray = []
-for i in range(20):
+for i in range(60):
 	rainArray.append(0)
 
 lastRainReading = 0.0
@@ -1609,7 +1601,7 @@ def addRainToArray(plusRain):
 def totalRainArray():
 	global rainArray
 	total = 0
-	for i in range(20):
+	for i in range(60):
 		total = total+rainArray[i]
 	return total
 
@@ -1635,6 +1627,7 @@ def updateRain():
 	global lastRainReading, rain60Minutes
 	addRainToArray(totalRain - lastRainReading)	
 	rain60Minutes = totalRainArray()
+	state.currentRainRate = (totalRain - lastRainReading)*60	
 	state.currentRain60Minutes = rain60Minutes
 	lastRainReading = totalRain
 
@@ -1826,7 +1819,7 @@ if (config.enable_MySQL_Logging == True):
 	scheduler.add_job(writeWeatherRecord, 'interval', seconds=5*60)
 	scheduler.add_job(writePowerRecord, 'interval', seconds=5*60)
 
-scheduler.add_job(updateRain, 'interval', seconds=5*60)
+scheduler.add_job(updateRain, 'interval', seconds=60)
 scheduler.add_job(statusRain, 'interval', seconds=60*60)
 
 if (config.SWDEBUG):
@@ -1845,7 +1838,7 @@ scheduler.add_job(WLAN_check, 'interval', seconds=30*60)
 scheduler.add_job(rebootPi, 'cron', day='5-30/5', hour=0, minute=4, args=["5 day Reboot"]) 
 	
 #check for Barometric Trend (every 15 minutes)
-scheduler.add_job(barometricTrend, 'interval', seconds=15*60)
+scheduler.add_job(barometricTrend, 'interval', seconds=60*60)
 
 if (config.DustSensor_Present):
     scheduler.add_job(DustSensor.read_AQI, 'interval', seconds=60*15)

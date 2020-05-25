@@ -17,6 +17,7 @@ currentInsideTemperature = 0.0
 currentInsideHumidity = 1
 
 currentRain60Minutes = 0.0
+currentRainRate = 0.0
 
 currentSunlightVisible = 0
 currentSunlightIR = 0

@@ -6,27 +6,25 @@
 
 # it is a good idea to copy this file into a file called "conflocal.py" and edit that instead of this one.  This file is wiped out if you update SkyWeather.
 
+#Debugmodes
 SWDEBUG = False
+DEGUGBLYNK = False
+#END
 
-SWVERSION = "000" # set in SkyWeather.py
-import uuid 
-  
-# printing the value of unique MAC 
-# address using uuid and getnode() function  
-MACADDRESS = hex(uuid.getnode()) 
+# Set from SkyWeather.Py startup
+SWVERSION = "000" 
+#END
 
+#MAIL
 mailUser = "yourusename"
 mailPassword = "yourmailpassword"
-
 notifyAddress ="you@example.com"
-
 fromAddress = "yourfromaddress@example.com"
-
 enableText = False
 textnotifyAddress = "yourphonenumber@yourprovider"
 
-#MySQL Logging and Password Information
 
+#MySQL Logging and Password Information
 enable_MySQL_Logging = False
 MySQL_Password = "password"
 
@@ -35,7 +33,6 @@ enable_WLAN_Detection = False
 PingableRouterAddress = "192.168.1.1"
 
 # LED configuration (on use on a Raspberry Pi 3B+)
-
 runLEDs = False
 
 # WXLink and SolarMAX configuration
@@ -47,43 +44,35 @@ Dual_MAX_WXLink = False
 SolarMAX_Type = ""
 
 # WeatherSTEM configuration
-
 USEWEATHERSTEM = False
 INTERVAL_CAM_PICS__SECONDS = 60
-STATIONMAC = MACADDRESS
+STATIONMAC = ""
 STATIONKEY="XXXXYYYY"
 STATIONHARDWARE=""
 
 
 # WeatherUnderground Station
-
 WeatherUnderground_Present = False
 WeatherUnderground_StationID = "KWXXXXX"
 WeatherUnderground_StationKey = "YYYYYYY"
 
-############
-# Blynk configuration
-############
 
+# Blynk configuration
 USEBLYNK = False 
 BLYNK_AUTH = 'xxxxx'
 BLYNK_URL = 'http://blynk-cloud.com/'
 
-############
+
 # AS3935 Lightning Configuration
-############
 # format: [NoiseFLoor, Indoor, TuneCap, DisturberDetection, WatchDogThreshold, SpikeDetection]
 AS3935_Lightning_Config = [2,1,3,0,3,3]
 
 
 
 # for barometeric pressure - needed to calculate sealevel equivalent - set your weatherstation elevation here
-
 BMP280_Altitude_Meters = 328.0
 
 # device present global variables
-
-
 Camera_Present = False
 TCA9545_I2CMux_Present = False
 SunAirPlus_Present = False
@@ -114,6 +103,7 @@ WXLink_LastMessageID = 0
 # Pin definitions
 pixelPin = 21
 
+#Dust Sensor
 DustSensorPin = 19
 DustSensorPowerPin = 26
 
@@ -121,7 +111,7 @@ DustSensorPowerPin = 26
 anemometerPin = 20
 rainPin = 13
 
-
+#Temperature sensor
 SHT30GSPIN = 6
 AM2315GSPIN = 6
 
@@ -129,5 +119,6 @@ AM2315GSPIN = 6
 GPIO_Pin_PowerDrive_Sig1 = 5
 GPIO_Pin_PowerDrive_Sig2 = 5     # To avoid stepping on GPIO 6 
 
+#Watchdog
 WATCHDOGTRIGGER = 4
 

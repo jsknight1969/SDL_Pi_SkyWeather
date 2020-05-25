@@ -29,8 +29,8 @@ def blynkInit():
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V6?value=0', timeout=10)
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V30?value=0', timeout=10)
         # initialize LEDs
-        r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?value=255', timeout=10)
-        r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?value=255', timeout=10)
+        #r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?value=255', timeout=10)
+        #r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?value=255', timeout=10)
 
         # read english Metric in from file
 
@@ -277,7 +277,7 @@ def blynkStateUpdate():
         put_body = json.dumps([tval])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V3', data=put_body, headers=put_header, timeout=10)
 
- 	#rain last hour
+ 	    #rain last hour
         # val = "{0:0.2f}".format(state.currentRain60Minutes)
         if (state.EnglishMetric == 1):
             tval = "{0:0.2f}mm".format(state.currentRain60Minutes) 
@@ -285,6 +285,15 @@ def blynkStateUpdate():
             tval = "{0:0.2f}in".format(state.currentRain60Minutes / 25.4) 
         put_body = json.dumps([tval])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V14', data=put_body, headers=put_header, timeout=10)
+
+        #rain rate
+        # val = "{0:0.2f}".format(state.currentRain60Minutes)
+        if (state.EnglishMetric == 1):
+            tval = "{0:0.2f}mm".format(state.currentRainRate) 
+        else:
+            tval = "{0:0.2f}in".format(state.currentRainRate / 25.4) 
+        put_body = json.dumps([tval])
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V15', data=put_body, headers=put_header, timeout=10)
 
         #Sunlight 
         val = "{0:0.0f}".format(state.currentSunlightVisible) 
