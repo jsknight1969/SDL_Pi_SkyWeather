@@ -58,7 +58,7 @@ sys.path.append('./SDL_Pi_HDC1000')
 sys.path.append('./SDL_Pi_AM2315')
 sys.path.append('./SDL_Pi_SHT30')
 sys.path.append('./BME680')
-sys.path.appent('./MD503')
+sys.path.append('./MD503')
 
 sys.path.append('./SDL_Pi_GrovePowerDrive')
 
