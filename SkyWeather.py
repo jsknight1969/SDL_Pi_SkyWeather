@@ -695,7 +695,6 @@ except:
 	config.MP503 = False
 
 
-
 def handle_as3935_interrupt(channel):
     global as3935Interrupt
 
@@ -1165,7 +1164,7 @@ def sampleWeather():
 
 		try:
 			print "--Sending Data to WeatherUnderground--"
-			WeatherUnderground.sendWeatherUndergroundData( as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+			WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
 		except:
 			print "--WeatherUnderground Data Send Failed"
 
@@ -1605,6 +1604,27 @@ def totalRainArray():
 		total = total+rainArray[i]
 	return total
 
+def rainRate():
+	global rainArray
+	total1 = 0
+	total5 = 0
+	total10 = 0
+	total = 0
+	for i in range(55, 60, 1):
+		total5 = total5 + rainArray[i]
+	for i in range(50,60,1):
+		total10 = total10 + rainArray[i]
+	total1 = rainArray[60]
+	if (total1 > .7):
+		total = total1 * 60
+	elif (total5 > .2):
+		total = total5 * 12
+	elif (total10 > 0):
+		total = total10 * 6
+	else:
+		total = 0
+	return total
+
 
 # print out faults inside events
 def ap_my_listener(event):
@@ -1795,7 +1815,7 @@ scheduler.add_job(tick, 'interval', seconds=60)
 
 # sample and Watchdog jobs
 
-scheduler.add_job(sampleAndDisplay, 'interval', seconds=45)
+scheduler.add_job(sampleAndDisplay, 'interval', seconds=30)
 scheduler.add_job(patTheDog, 'interval', seconds=10)   # reset the WatchDog Timer
 
 # every minute, check for button changes
