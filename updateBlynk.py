@@ -29,8 +29,8 @@ def blynkInit():
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V6?value=0', timeout=10)
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V30?value=0', timeout=10)
         # initialize LEDs
-        #r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?value=255', timeout=10)
-        #r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?value=255', timeout=10)
+        r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?value=255', timeout=10)
+        r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?value=255', timeout=10)
 
         # read english Metric in from file
 
@@ -403,8 +403,8 @@ def blynkStateUpdate():
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?color=%2300FF00', timeout=10) # Green
             if (DEBUGBLYNK):
                 print "blynkAlarmUpdate:OTHER:r.status_code:",r.status_code
-            else:
-                r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?color=%23FF0000', timeout=10) # red
+        else:
+            r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?color=%23FF0000', timeout=10) # red
 
 
         return 1
