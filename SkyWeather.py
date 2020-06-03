@@ -1615,14 +1615,18 @@ def rainRate():
 	for i in range(50,60,1):
 		total10 = total10 + rainArray[i]
 	total1 = rainArray[60]
-	if (total1 > .7):
+	if (total1 > .2):
 		total = total1 * 60
+		print "using 1 minute rate"
 	elif (total5 > .2):
 		total = total5 * 12
-	elif (total10 > 0):
+		print "using 5 minute rate"
+	elif (total10 > .2 ):
 		total = total10 * 6
+		print "using 10 minute rate"
 	else:
 		total = 0
+		print "no rate"
 	return total
 
 
