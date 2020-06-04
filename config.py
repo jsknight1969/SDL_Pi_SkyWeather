@@ -10,6 +10,7 @@
 SWDEBUG = False
 DEGUGBLYNK = False
 #END
+#check for git
 
 # Set from SkyWeather.Py startup
 SWVERSION = "000" 
