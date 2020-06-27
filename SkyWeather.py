@@ -813,26 +813,26 @@ def writeSunAirPlusStats():
 # write weather stats out to file
 def writeWeatherStats():
 
-        f = open("/home/pi/SDL_Pi_SkyWeather/state/WeatherStats.txt", "w")
+    	f = open("/home/pi/SDL_Pi_SkyWeather/state/WeatherStats.txt", "w")
 	f.write(str(totalRain) + '\n') 
 	f.write(str(as3935LightningCount) + '\n')
 	f.write(str(as3935LastInterrupt) + '\n')
 	f.write(str(as3935LastDistance) + '\n')
 	f.write(str(as3935LastStatus) + '\n')
- 	f.write(str(currentWindSpeed) + '\n')
+	f.write(str(currentWindSpeed) + '\n')
 	f.write(str(currentWindGust) + '\n')
 	f.write(str(totalRain)  + '\n')
-  	f.write(str(bmp180Temperature)  + '\n')
+	f.write(str(bmp180Temperature)  + '\n')
 	f.write(str(bmp180Pressure) + '\n')
 	f.write(str(bmp180Altitude) + '\n')
 	f.write(str(bmp180SeaLevel)  + '\n')
-    	f.write(str(outsideTemperature) + '\n')
+	f.write(str(outsideTemperature) + '\n')
 	f.write(str(outsideHumidity) + '\n')
 	f.write(str(currentWindDirection) + '\n')
 	f.write(str(currentWindDirectionVoltage) + '\n')
 	f.write(str(HTUtemperature) + '\n')
 	f.write(str(HTUhumidity) + '\n')
-        f.close()
+	f.close()
 
 
 
@@ -1147,6 +1147,43 @@ def sampleWeather():
 		state.Outdoor_AirQuality_Sensor_Value = sensor_value
 
 
+		
+	sampleSunAirPlus()
+
+	# set State Variables
+
+	# Weather Variables
+	state.currentOutsideTemperature = outsideTemperature + config.TempOffset
+	state.currentOutsideHumidity = outsideHumidity + config.HumOffset
+
+	state.currentInsideTemperature = bmp180Temperature
+	state.currentInsideHumidity = bmp180Humidity 
+
+	state.currentRain60Minutes =  rain60Minutes
+
+	state.currentSunlightVisible = SunlightVisible
+	state.currentSunlightIR = SunlightIR
+	state.currentSunlightUV = SunlightUV
+	state.currentSunlightUVIndex  = SunlightUVIndex
+
+	state.ScurrentWindSpeed = currentWindSpeed
+	state.ScurrentWindGust  = currentWindGust
+	state.ScurrentWindDirection  = currentWindDirection
+	state.currentTotalRain  = totalRain
+
+	state.currentBarometricPressure = bmp180Pressure 
+
+	state.currentAltitude = bmp180Altitude
+	state.currentSeaLevel = bmp180SeaLevel
+
+
+	# check for turn fan on
+	if (state.currentInsideTemperature > TEMPFANTURNON):
+		turnFanOn()
+	# check for turn fan off
+	if (state.currentInsideTemperature < TEMPFANTURNOFF):
+		turnFanOff()
+
 	if (config.WeatherUnderground_Present == True):
 
 		if (config.WXLink_Present):
@@ -1163,50 +1200,14 @@ def sampleWeather():
 
 		try:
 			print "--Sending Data to WeatherUnderground--"
-			WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+			#WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+			WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, state.currentOutsideTemperature, state.currentOutsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
 		except:
 			print "--WeatherUnderground Data Send Failed"
 
 	else:
 		# set the Data to stale  
 		config.WXLink_Data_Fresh = False
-
-        
-        sampleSunAirPlus()
-
-        # set State Variables
-
-        # Weather Variables
-        state.currentOutsideTemperature = outsideTemperature 
-        state.currentOutsideHumidity = outsideHumidity 
-
-        state.currentInsideTemperature = bmp180Temperature
-        state.currentInsideHumidity = bmp180Humidity 
-
-        state.currentRain60Minutes =  rain60Minutes
-
-        state.currentSunlightVisible = SunlightVisible
-        state.currentSunlightIR = SunlightIR
-        state.currentSunlightUV = SunlightUV
-        state.currentSunlightUVIndex  = SunlightUVIndex
-
-        state.ScurrentWindSpeed = currentWindSpeed
-        state.ScurrentWindGust  = currentWindGust
-        state.ScurrentWindDirection  = currentWindDirection
-        state.currentTotalRain  = totalRain
-
-        state.currentBarometricPressure = bmp180Pressure 
-
-        state.currentAltitude = bmp180Altitude
-        state.currentSeaLevel = bmp180SeaLevel
-
-
-        # check for turn fan on
-        if (state.currentInsideTemperature > TEMPFANTURNON):
-            turnFanOn()
-        # check for turn fan off
-        if (state.currentInsideTemperature < TEMPFANTURNOFF):
-            turnFanOff()
 
 	# turn I2CBus 0 on
  	if (config.TCA9545_I2CMux_Present):
@@ -1400,12 +1401,11 @@ def writeWeatherRecord():
 	try:
 		print("trying database")
     		con = mdb.connect('localhost', 'root', config.MySQL_Password, 'SkyWeather');
-
     		cur = con.cursor()
 		print "before query"
 
 		#query = 'INSERT INTO WeatherData(TimeStamp,as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  outsideTemperature, outsideHumidity, currentWindDirection, currentWindDirectionVoltage, insideTemperature, insideHumidity, AQI) VALUES(UTC_TIMESTAMP(), %.3f, %.3f, %.3f, "%s", %.3f, %.3f, %.3f, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  outsideTemperature, outsideHumidity, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, state.Outdoor_AirQuality_Sensor_Value)
-		query = 'INSERT INTO WeatherData(TimeStamp,as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  outsideTemperature, outsideHumidity, currentWindDirection, currentWindDirectionVoltage, insideTemperature, insideHumidity, AQI) VALUES(UTC_TIMESTAMP(), %.3f, %.3f, %.3f, "%s", %.3f, %.3f, %.3f, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, state.ScurrentWindSpeed, state.ScurrentWindGust, state.currentTotalRain,  state.currentInsideTemperature, state.currentBarometricPressure, state.currentAltitude,  state.currentSeaLevel,  state.currentOutsideTemperature, state.currentOutsideHumidity, state.ScurrentWindDirection, currentWindDirectionVoltage, state.currentInsideTemperature, state.currentInsideHumidity, state.Outdoor_AirQuality_Sensor_Value)
+		query = 'INSERT INTO WeatherData(TimeStamp,as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  state.currentOutsideTemperature, state.currentOutsideHumidity, currentWindDirection, currentWindDirectionVoltage, insideTemperature, insideHumidity, AQI) VALUES(UTC_TIMESTAMP(), %.3f, %.3f, %.3f, "%s", %.3f, %.3f, %.3f, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, state.ScurrentWindSpeed, state.ScurrentWindGust, state.currentTotalRain,  state.currentInsideTemperature, state.currentBarometricPressure, state.currentAltitude,  state.currentSeaLevel,  state.currentOutsideTemperature, state.currentOutsideHumidity, state.ScurrentWindDirection, currentWindDirectionVoltage, state.currentInsideTemperature, state.currentInsideHumidity, state.Outdoor_AirQuality_Sensor_Value)
 		print("query=%s" % query)
 
 		cur.execute(query)

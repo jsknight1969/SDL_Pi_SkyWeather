@@ -3,7 +3,6 @@
 #
 #
 
-
 # WeatherSTEM info
 
 WeatherSTEMHash = ""
@@ -12,6 +11,8 @@ WeatherSTEMHash = ""
 
 currentOutsideTemperature = 0.0
 currentOutsideHumidity = 1
+OutsideTempHigh = 0
+OutsideTempLow = 0
 
 currentInsideTemperature = 0.0
 currentInsideHumidity = 1

@@ -123,3 +123,6 @@ GPIO_Pin_PowerDrive_Sig2 = 5     # To avoid stepping on GPIO 6
 #Watchdog
 WATCHDOGTRIGGER = 4
 
+#offsets
+TempOffset = 0 #in Celcius
+HumOffset = 0
