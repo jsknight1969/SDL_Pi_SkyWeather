@@ -91,6 +91,8 @@ OLED_Originally_Present = False
 WXLink_Present = False
 Sunlight_Present = False
 TSL2591_Present = False
+
+#set this to true if you have the sensor, false if you do not
 DustSensor_Present = True
 
 # set Sunlight High Gain (indoors - 1) or Low Gain (outdoors - 0)
