@@ -174,6 +174,7 @@ except:
 	print ">>>>>>>>>>>>>>>>>>><<<<<<<<<<<"
 	config.TCA9545_I2CMux_Present = False
 
+print ("TCA9545 detection: ", config.TCA9545_I2CMux_Present)
 
 
 
@@ -251,6 +252,7 @@ try:
 except:
     config.TSL2591_Present = False 
 
+print ("TSL2591 detection: ", config.TSL2591_Present)
 
 
 ###############
@@ -288,6 +290,8 @@ try:
 except:
         config.Sunlight_Present = False
 
+print ("Sunlight SI1145 Detection: ", config.Sunlight_Present)
+
 def returnStatusLine(device, state):
 
         returnString = device
@@ -322,6 +326,7 @@ try:
 except:
     config.Camera_Present = False
 
+print ("PiCamera detection: ", config.Camera_Present)
 
 
 # semaphore primitives for preventing I2C conflicts
@@ -351,7 +356,7 @@ try:
 except:
         config.SunAirPlus_Present = False
 
-
+print ("SunAirPlus Sensor detection: ", config.SunAirPlus_Present)
 
 SUNAIRLED = 25
 
@@ -379,6 +384,7 @@ try:
 except:
         config.HDC1080_Present = False
 
+print ('HDC1080 Detection:', config.HDC1080_Present)
 
 
 ###############
@@ -528,6 +534,8 @@ except:
         config.OLED_Originally_Present = False
         config.OLED_Present = False
 
+print ("OLED SSD_1306 detection: ", config.OLED_Present)
+
 def initializeOLED():
     try:
         RST =27
@@ -551,7 +559,7 @@ def process_as3935_interrupt():
     global as3935Interrupt
     global as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus
 
-    as3935Interrupt = False
+    #as3935Interrupt = False
 
     print "processing Interrupt from as3935"
     # turn I2CBus 1 on for low loading
@@ -587,7 +595,7 @@ def process_as3935_interrupt():
 
 	pclogging.log(pclogging.INFO, __name__, "Lightning Detected "  + str(distance) + "km away. (%s)" % now)
         if (config.enableText):
-	    sendemail.sendEmail("test", config.STATIONKEY + " Lightning Detected\n", as3935LastStatus, config.textnotifyAddress,  config.fromAddress, "");
+	    sendemail.sendEmail("test", config.STATIONKEY + " Lightning Detected\n", as3935LastStatus, config.textnotifyAddress,  config.fromAddress, "")
         # now set LED parameters
         state.currentAs3935LastLightningTimeStamp = time.time()
     
@@ -695,11 +703,24 @@ time.sleep(0.003)
 
 
 def handle_as3935_interrupt(channel):
-    global as3935Interrupt
+	global as3935Interrupt
+	print("Processing an interrupt from AS3935")
+	as3935Interrupt = True
+	#if (as3935Interrupt == True):
+	try:
+		print("AS3935 Interrupt")
+		I2C_Lock.acquire()
+		process_as3935_interrupt()
+	except IOError as e:
+		print("I/O error({0}): {1}".format(e.errno, e.strerror))
+		print("exception - as3935 I2C did not work")
+      
+	I2C_Lock.release()
+    # 	if (config.TCA9545_I2CMux_Present):
+    #         	tca9545.write_control_register(TCA9545_CONFIG_BUS0)
+	
+	as3935Interrupt = False
 
-    print "as3935 Interrupt"
-
-    as3935Interrupt = True
 
 
 # define Interrupt Pin for AS3935
@@ -1779,14 +1800,15 @@ if (config.USEBLYNK):
      updateBlynk.blynkEventUpdate("SW Startup Version "+config.SWVERSION)
      updateBlynk.blynkStatusTerminalUpdate("SW Startup Version "+config.SWVERSION) 
 
-subjectText = "The "+ config.STATIONKEY + " SkyWeather Raspberry Pi has #rebooted."
-ipAddress = commands.getoutput('hostname -I')
-bodyText = "SkyWeather Version "+config.SWVERSION+ " Startup \n"+ipAddress+"\n"
-if (config.SunAirPlus_Present):
-	sampleSunAirPlus()
-	bodyText = bodyText + "\n" + "BV=%0.2fV/BC=%0.2fmA/SV=%0.2fV/SC=%0.2fmA" % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent)
+if (config.enable_mail):
+	subjectText = "The "+ config.STATIONKEY + " SkyWeather Raspberry Pi has #rebooted."
+	ipAddress = commands.getoutput('hostname -I')
+	bodyText = "SkyWeather Version "+config.SWVERSION+ " Startup \n"+ipAddress+"\n"
+	if (config.SunAirPlus_Present):
+		sampleSunAirPlus()
+		bodyText = bodyText + "\n" + "BV=%0.2fV/BC=%0.2fmA/SV=%0.2fV/SC=%0.2fmA" % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent)
 
-sendemail.sendEmail("test", bodyText, subjectText ,config.notifyAddress,  config.fromAddress, "");
+	sendemail.sendEmail("test", bodyText, subjectText ,config.notifyAddress,  config.fromAddress, "")
 
 
 
@@ -1796,9 +1818,9 @@ sampleAndDisplay()
 
 # test SkyWeather
 
-print ("taking SkyPicture")
 if(config.Camera_Present):
-    SkyCamera.takeSkyPicture()
+	print ("taking SkyPicture")
+	SkyCamera.takeSkyPicture()
     #print ("sending SkyCamera")
     #SkyCamera.sendSkyWeather()
 
@@ -1920,24 +1942,20 @@ if (config.WXLink_Present == False):
 while True:
 	
 	# process Interrupts from Lightning
+# 	if (as3935Interrupt == True):
+# 		try:
+# 			print("AS3935 Interrupt")
+# 			I2C_Lock.acquire()
+# 			process_as3935_interrupt()
+# 		except IOError as e:
+# 			print("I/O error({0}): {1}".format(e.errno, e.strerror))
+# 			print("exception - as3935 I2C did not work")
+        
+# 		I2C_Lock.release()
 
-	if (as3935Interrupt == True):
-                print "AS3935 Interrupt"
-                I2C_Lock.acquire()
-
-		try:
-			process_as3935_interrupt()
-
-			
-                except IOError as e:
-
-                        print "I/O error({0}): {1}".format(e.errno, e.strerror)
-			print "exception - as3935 I2C did not work"
-                I2C_Lock.release()
-
-        # 	if (config.TCA9545_I2CMux_Present):
-        #         	tca9545.write_control_register(TCA9545_CONFIG_BUS0)
+#         # 	if (config.TCA9545_I2CMux_Present):
+#         #         	tca9545.write_control_register(TCA9545_CONFIG_BUS0)
 	
-
+# as3935Interrupt = False
 	time.sleep(1.0)
 

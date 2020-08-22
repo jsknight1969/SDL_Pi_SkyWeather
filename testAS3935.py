@@ -42,8 +42,6 @@ TCA9545_CONFIG_BUS3  =                (0x08)  # 1 = enable, 0 = disable
 # I2C Mux TCA9545 Detection
 try:
 	tca9545 = SDL_Pi_TCA9545.SDL_Pi_TCA9545(addr=TCA9545_ADDRESS, bus_enable = TCA9545_CONFIG_BUS0)
-
-
 	# turn I2CBus 1 on to reduce loading on I2CBus 0
 	tca9545.write_control_register(TCA9545_CONFIG_BUS1)
 	TCA9545_I2CMux_Present = True
