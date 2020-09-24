@@ -1566,25 +1566,38 @@ def WLAN_check():
 
 
 #Rain calculations
+lastraintime = 0
+# rainArray = []
+# for i in range(20):
+# 	rainArray.append(0)
 
-rainArray = []
-for i in range(20):
-	rainArray.append(0)
+# lastRainReading = 0.0
 
-lastRainReading = 0.0
-
-def addRainToArray(plusRain):
-	global rainArray
-	del rainArray[0]
-	rainArray.append(plusRain)
-	#print "rainArray=", rainArray
+# def addRainToArray(plusRain):
+# 	global rainArray
+# 	del rainArray[0]
+# 	rainArray.append(plusRain)
+# 	#print "rainArray=", rainArray
 
 def totalRainArray():
-	global rainArray
-	total = 0
-	for i in range(20):
-		total = total+rainArray[i]
-	return total
+# 	global rainArray
+# 	total = 0
+# 	for i in range(20):
+# 		total = total+rainArray[i]
+	global lastraintime
+	if (lastraintime == 0):
+		total = 0
+		lastraintime = time.time()
+	elif (lastraintime + 300 < time.time()):
+		lastraintime = time.time()
+		total = 0
+	else:
+		currenttime = time.time()
+		time_delta = (currenttime - lastraintime)
+		total = 36000/time_delta * .01
+		lastraintime = currenttime
+
+ 	return total
 
 
 # print out faults inside events
@@ -1606,7 +1619,7 @@ def killLogger():
 
 def updateRain():
 	global lastRainReading, rain60Minutes
-	addRainToArray(totalRain - lastRainReading)	
+	#addRainToArray(totalRain - lastRainReading)	
 	rain60Minutes = totalRainArray()
 	lastRainReading = totalRain
 
