@@ -11,13 +11,13 @@
 
 # imports
 # Check for user imports
-try:
+#try:
 	#read yml file
 	
-except:
-	try:
-		import conflocal as config
-	except ImportError:
+#except:
+try:
+	import conflocal as config
+except ImportError:
 		import config
 
 config.SWVERSION = "056-KIWK"
@@ -95,7 +95,7 @@ sys.path.append('./SDL_Pi_GrovePowerDrive')
 logging.basicConfig()
 
 #used to indicate interrupt has happened from as3936
-as3935_Interrupt_Happened = False;
+as3935_Interrupt_Happened = False
 
 ################
 # Device Present State Variables
