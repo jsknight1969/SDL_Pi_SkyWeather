@@ -1610,6 +1610,7 @@ for i in range(60):
 	rainArray.append(0)
 
 lastRainReading = 0.0
+lastraintime = 0
 
 def addRainToArray(plusRain):
 	global rainArray
@@ -1618,37 +1619,57 @@ def addRainToArray(plusRain):
 	print "rainArray=", rainArray
 
 def totalRainArray():
-	global rainArray
-	total = 0
-	for i in range(60):
-		total = total+rainArray[i]
-	return total
+	 global rainArray
+	 total = 0
+	 for i in range(60):
+	 	total = total+rainArray[i]
+	 return total
+	
 
 def rainRate():
-	global rainArray
-	total1 = 0
-	total5 = 0
-	total10 = 0
-	total = 0
-	for i in range(55, 60, 1):
-		total5 = total5 + rainArray[i]
-	for i in range(50,60,1):
-		total10 = total10 + rainArray[i]
-	total1 = rainArray[60]
-	if (total1 > .3):
-		total = total1 * 60
-		print "using 1 minute rate"
-	elif (total5 > .3):
-		total = total5 * 12
-		print "using 5 minute rate"
-	elif (total10 > .3 ):
-		total = total10 * 6
-		print "using 10 minute rate"
-	else:
+	# global rainArray
+	# total1 = 0
+	# total5 = 0
+	# total10 = 0
+	# total = 0
+	# for i in range(55, 60, 1):
+	# 	total5 = total5 + rainArray[i]
+	# for i in range(50,60,1):
+	# 	total10 = total10 + rainArray[i]
+	# total1 = rainArray[60]
+	# if (total1 > .3):
+	# 	total = total1 * 60
+	# 	print "using 1 minute rate"
+	# elif (total5 > .3):
+	# 	total = total5 * 12
+	# 	print "using 5 minute rate"
+	# elif (total10 > .3 ):
+	# 	total = total10 * 6
+	# 	print "using 10 minute rate"
+	# else:
+	# 	total = 0
+	# 	print "no rate"
+	#return total
+	global lastraintime
+	rainRateReset()
+	if (lastraintime == 0):
 		total = 0
-		print "no rate"
-	return total
+		lastraintime = time.time()
+	else:
+		currenttime = time.time()
+		time_delta = (currenttime - lastraintime)
+		total = 36000/time_delta * .01
+		lastraintime = currenttime
 
+ 	return total
+
+def rainRateReset():
+	global lastraintime
+	if (lastraintime > 0):
+		print "Rain Reset: %s - %s" % lastraintime + 300 % time.time()
+		if (lastraintime + 300 < time.time()):
+			print "Reset rain time"
+			lastraintime = 0
 
 # print out faults inside events
 def ap_my_listener(event):
@@ -1671,7 +1692,8 @@ def updateRain():
 	global lastRainReading, rain60Minutes
 	addRainToArray(totalRain - lastRainReading)	
 	rain60Minutes = totalRainArray()
-	state.currentRainRate = (totalRain - lastRainReading)*60	
+	#state.currentRainRate = (totalRain - lastRainReading)*60	
+	state.currentRainRate = rainRate()
 	state.currentRain60Minutes = rain60Minutes
 	lastRainReading = totalRain
 
@@ -1884,6 +1906,9 @@ scheduler.add_job(rebootPi, 'cron', day='5-30/5', hour=0, minute=4, args=["5 day
 	
 #check for Barometric Trend (every 15 minutes)
 scheduler.add_job(barometricTrend, 'interval', seconds=60*60)
+
+#reset rain rate
+scheduler.add_job(rainRateReset, 'interval', seconds = 60*3)
 
 if (config.DustSensor_Present):
     scheduler.add_job(DustSensor.read_AQI, 'interval', seconds=60*15)
