@@ -1205,31 +1205,6 @@ def sampleWeather():
 	if (state.currentInsideTemperature < TEMPFANTURNOFF):
 		turnFanOff()
 
-	if (config.WeatherUnderground_Present == True):
-
-		if (config.WXLink_Present):
-			if (config.WXLink_Data_Fresh):
-				# continue with send to WeatherUnderground
-				print "WXLink_Data fresh and present"
-			else:
-				# data is not fresh, so don't send to WeatherUnderground
-				print "WXLink_Data Stale don't send to WeatherUnderground"
-				return
-
-		# always set message stale set to False since we have consumed it
-		config.WXLink_Data_Fresh = False
-
-		try:
-			print "--Sending Data to WeatherUnderground--"
-			#WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
-			WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, state.currentOutsideTemperature, state.currentOutsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
-		except:
-			print "--WeatherUnderground Data Send Failed"
-
-	else:
-		# set the Data to stale  
-		config.WXLink_Data_Fresh = False
-
 	# turn I2CBus 0 on
  	if (config.TCA9545_I2CMux_Present):
          	tca9545.write_control_register(TCA9545_CONFIG_BUS0)
@@ -1383,14 +1358,38 @@ def sampleAndDisplay():
 
 		print "Lightning Count = ", as3935LightningCount
 
-	print "----------------- "
+		print "----------------- "
         
-        if (config.SWDEBUG == True):
-            state.printState()
+    	if (config.SWDEBUG == True):
+        	state.printState()
 
 
-        if (config.USEBLYNK):
-           updateBlynk.blynkStateUpdate()
+    	if (config.USEBLYNK):
+        	updateBlynk.blynkStateUpdate()
+		   
+		if (config.WeatherUnderground_Present == True):
+			if (config.WXLink_Present):
+				if (config.WXLink_Data_Fresh):
+					# continue with send to WeatherUnderground
+					print "WXLink_Data fresh and present"
+				else:
+					# data is not fresh, so don't send to WeatherUnderground
+					print "WXLink_Data Stale don't send to WeatherUnderground"
+					return
+
+			# always set message stale set to False since we have consumed it
+			config.WXLink_Data_Fresh = False
+
+			try:
+				print "--Sending Data to WeatherUnderground--"
+				#WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+				WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, state.currentOutsideTemperature, state.currentOutsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+			except:
+				print "--WeatherUnderground Data Send Failed"
+
+		else:
+			# set the Data to stale  
+			config.WXLink_Data_Fresh = False
         
 	print "----------------- "
 	print " Sample and Display Done"
@@ -1665,7 +1664,7 @@ def rainRate():
 def rainRateReset():
 	global lastraintime
 	if (lastraintime > 0):
-		print "Rain Reset: %s - %s" % lastraintime + 300 % time.time()
+		print "Rain Reset: %s - %s" % lastraintime + 300 , time.time()
 		if (lastraintime + 300 < time.time()):
 			print "Reset rain time"
 			lastraintime = 0
