@@ -1663,11 +1663,13 @@ def rainRate():
 
 def rainRateReset():
 	global lastraintime
-	if (lastraintime > 0):
-		print "Rain Reset"
-		if (lastraintime + 300 < time.time()):
-			print ".....resetting rain rate"
-			lastraintime = 0
+	lresetat = lastraintime + 300 
+	print 'lastraintime: %s' % lastraintime
+	print 'will update at: %s' % lresetat
+	print 'current: %s' % time.time()
+	if (lastraintime > 0) and (lresetat < time.time()):
+		print ".....resetting rain rate"
+		lastraintime = 0
 
 # print out faults inside events
 def ap_my_listener(event):
