@@ -1651,16 +1651,15 @@ def rainRate():
 	# 	print "no rate"
 	#return total
 	global lastraintime
+	currenttime = time.time()
 	rainRateReset()
 	if (lastraintime == 0):
 		total = 0
-		lastraintime = time.time()
 	else:
-		currenttime = time.time()
 		time_delta = (currenttime - lastraintime)
 		total = 36000/time_delta * .01
-		lastraintime = currenttime
 
+	lastraintime = currenttime
  	return total
 
 def rainRateReset():
