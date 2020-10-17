@@ -1610,6 +1610,7 @@ for i in range(60):
 
 lastRainReading = 0.0
 lastraintime = 0
+lastraincount = SDL_Pi_WeatherRack.get_current_rain_count()
 
 def addRainToArray(plusRain):
 	global rainArray
@@ -1626,50 +1627,33 @@ def totalRainArray():
 	
 
 def rainRate():
-	# global rainArray
-	# total1 = 0
-	# total5 = 0
-	# total10 = 0
-	# total = 0
-	# for i in range(55, 60, 1):
-	# 	total5 = total5 + rainArray[i]
-	# for i in range(50,60,1):
-	# 	total10 = total10 + rainArray[i]
-	# total1 = rainArray[60]
-	# if (total1 > .3):
-	# 	total = total1 * 60
-	# 	print "using 1 minute rate"
-	# elif (total5 > .3):
-	# 	total = total5 * 12
-	# 	print "using 5 minute rate"
-	# elif (total10 > .3 ):
-	# 	total = total10 * 6
-	# 	print "using 10 minute rate"
-	# else:
+	# currentTR = totalRain
+	# global lastraintime
+	# currenttime = time.time()
+	# rainRateReset()
+	# if (lastraintime == 0):
 	# 	total = 0
-	# 	print "no rate"
-	#return total
-	global lastraintime
-	currenttime = time.time()
-	rainRateReset()
-	if (lastraintime == 0):
-		total = 0
-	else:
-		time_delta = (currenttime - lastraintime)
-		total = 36000/time_delta * .01
+	# else:
+	# 	time_delta = (currenttime - lastraintime)
+	# 	total = 36000/time_delta * .01
+	# 	lastraintime = currenttime
+ 	global lastraincount
+	currentcount = SDL_Pi_WeatherRack.get_current_rain_count() 
+	total = (currentcount - lastraincount) * .01
+	lastraincount = currentcount
+	print "...Rain Rate: %s" % total
+	return total
 
-	lastraintime = currenttime
- 	return total
 
-def rainRateReset():
-	global lastraintime
-	lresetat = lastraintime + 300 
-	print 'lastraintime: %s' % lastraintime
-	print 'will update at: %s' % lresetat
-	print 'current: %s' % time.time()
-	if (lastraintime > 0) and (lresetat < time.time()):
-		print ".....resetting rain rate"
-		lastraintime = 0
+# def rainRateReset():
+# 	global lastraintime
+# 	lresetat = lastraintime + 300 
+# 	print 'lastraintime: %s' % lastraintime
+# 	print 'will update at: %s' % lresetat
+# 	print 'current: %s' % time.time()
+# 	if (lastraintime > 0) and (lresetat < time.time()):
+# 		print ".....resetting rain rate"
+# 		lastraintime = 0
 
 # print out faults inside events
 def ap_my_listener(event):

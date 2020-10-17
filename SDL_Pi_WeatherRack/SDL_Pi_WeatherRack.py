@@ -387,7 +387,9 @@ class SDL_Pi_WeatherRack:
        			SDL_Pi_WeatherRack._currentRainCount = SDL_Pi_WeatherRack._currentRainCount+1
     			if(currentTime<SDL_Pi_WeatherRack._currentRainMin):
      				SDL_Pi_WeatherRack._currentRainMin=currentTime;
-
-
-        def returnInterruptClicks(self):
+	
+	def returnInterruptClicks(self):
 		return SDL_INTERRUPT_CLICKS
+
+	def get_current_rain_count(self):
+		return SDL_Pi_WeatherRack._currentRainCount
