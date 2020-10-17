@@ -1610,7 +1610,7 @@ for i in range(60):
 
 lastRainReading = 0.0
 lastraintime = 0
-lastraincount = SDL_Pi_WeatherRack.get_current_rain_count()
+lastraincount = weatherStation.get_current_rain_count()
 
 def addRainToArray(plusRain):
 	global rainArray
