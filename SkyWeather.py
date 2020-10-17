@@ -1892,7 +1892,7 @@ scheduler.add_job(rebootPi, 'cron', day='5-30/5', hour=0, minute=4, args=["5 day
 scheduler.add_job(barometricTrend, 'interval', seconds=60*60)
 
 #reset rain rate
-scheduler.add_job(rainRateReset, 'interval', seconds = 60*3)
+#scheduler.add_job(rainRateReset, 'interval', seconds = 60*3)
 
 if (config.DustSensor_Present):
     scheduler.add_job(DustSensor.read_AQI, 'interval', seconds=60*15)
