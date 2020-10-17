@@ -1638,7 +1638,7 @@ def rainRate():
 	# 	total = 36000/time_delta * .01
 	# 	lastraintime = currenttime
  	global lastraincount
-	currentcount = SDL_Pi_WeatherRack.get_current_rain_count() 
+	currentcount = weatherStation.get_current_rain_count() 
 	total = (currentcount - lastraincount) * .01
 	lastraincount = currentcount
 	print "...Rain Rate: %s" % total
