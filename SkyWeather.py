@@ -1736,7 +1736,8 @@ def checkForButtons():
 def func_wundergroud():
 	print "------ Update Weather Underground ------"
 	if (config.WeatherUnderground_Present == True):
-		updateBlynk.blynkStatusTerminalUpdate("Updated sent to WUnderground: " + time.time())
+		strstatus = "Updated sent to WUnderground: %s", time.time()
+		updateBlynk.blynkStatusTerminalUpdate(strstatus)
 		print "  ------ SENDING -------"
 		if (config.WXLink_Present):
 			if (config.WXLink_Data_Fresh):
