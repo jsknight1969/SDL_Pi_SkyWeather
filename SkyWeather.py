@@ -1734,7 +1734,10 @@ def checkForButtons():
         I2C_Lock.release()
         
 def func_wundergroud():
+	print "------ Update Weather Underground ------"
 	if (config.WeatherUnderground_Present == True):
+		updateBlynk.blynkStatusTerminalUpdate("Updated sent to WUnderground: " + time.time())
+		print "  ------ SENDING -------"
 		if (config.WXLink_Present):
 			if (config.WXLink_Data_Fresh):
 				# continue with send to WeatherUnderground
