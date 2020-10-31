@@ -1367,29 +1367,29 @@ def sampleAndDisplay():
     	if (config.USEBLYNK):
         	updateBlynk.blynkStateUpdate()
 		   
-		if (config.WeatherUnderground_Present == True):
-			if (config.WXLink_Present):
-				if (config.WXLink_Data_Fresh):
-					# continue with send to WeatherUnderground
-					print "WXLink_Data fresh and present"
-				else:
-					# data is not fresh, so don't send to WeatherUnderground
-					print "WXLink_Data Stale don't send to WeatherUnderground"
-					return
+		# if (config.WeatherUnderground_Present == True):
+		# 	if (config.WXLink_Present):
+		# 		if (config.WXLink_Data_Fresh):
+		# 			# continue with send to WeatherUnderground
+		# 			print "WXLink_Data fresh and present"
+		# 		else:
+		# 			# data is not fresh, so don't send to WeatherUnderground
+		# 			print "WXLink_Data Stale don't send to WeatherUnderground"
+		# 			return
 
-			# always set message stale set to False since we have consumed it
-			config.WXLink_Data_Fresh = False
+		# 	# always set message stale set to False since we have consumed it
+		# 	config.WXLink_Data_Fresh = False
 
-			try:
-				print "--Sending Data to WeatherUnderground--"
-				#WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
-				WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, state.currentOutsideTemperature, state.currentOutsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
-			except:
-				print "--WeatherUnderground Data Send Failed"
+		# 	try:
+		# 		print "--Sending Data to WeatherUnderground--"
+		# 		#WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+		# 		WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, state.currentOutsideTemperature, state.currentOutsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+		# 	except:
+		# 		print "--WeatherUnderground Data Send Failed"
 
-		else:
-			# set the Data to stale  
-			config.WXLink_Data_Fresh = False
+		# else:
+		# 	# set the Data to stale  
+		# 	config.WXLink_Data_Fresh = False
         
 	print "----------------- "
 	print " Sample and Display Done"
@@ -1733,7 +1733,29 @@ def checkForButtons():
         initializeOLED()
         I2C_Lock.release()
         
+def func_wundergroud():
+	if (config.WeatherUnderground_Present == True):
+		if (config.WXLink_Present):
+			if (config.WXLink_Data_Fresh):
+				# continue with send to WeatherUnderground
+				print "WXLink_Data fresh and present"
+			else:
+				# data is not fresh, so don't send to WeatherUnderground
+				print "WXLink_Data Stale don't send to WeatherUnderground"
+				return
 
+		# always set message stale set to False since we have consumed it
+		config.WXLink_Data_Fresh = False
+		try:
+			print "--Sending Data to WeatherUnderground--"
+			#WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, outsideTemperature, outsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+			WeatherUnderground.sendWeatherUndergroundData( config.WeatherUnderground_StationID, config.WeatherUnderground_StationKey, as3935LightningCount, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain, bmp180Temperature, bmp180SeaLevel, bmp180Altitude,  bmp180SeaLevel, state.currentOutsideTemperature, state.currentOutsideHumidity, crc_check, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity, rain60Minutes)
+		except:
+			print "--WeatherUnderground Data Send Failed"
+
+	else:
+		# set the Data to stale  
+		config.WXLink_Data_Fresh = False
 
 
 print  ""
@@ -1893,6 +1915,9 @@ scheduler.add_job(barometricTrend, 'interval', seconds=60*60)
 
 #reset rain rate
 #scheduler.add_job(rainRateReset, 'interval', seconds = 60*3)
+
+#weather undergroud update
+scheduler.add_job(func_wundergroud, 'interval', seconds = 60)
 
 if (config.DustSensor_Present):
     scheduler.add_job(DustSensor.read_AQI, 'interval', seconds=60*15)
