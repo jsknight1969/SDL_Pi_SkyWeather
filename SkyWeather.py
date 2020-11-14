@@ -831,29 +831,69 @@ def writeSunAirPlusStats():
 	f.write(str(batteryCharge) + '\n')
         f.close()
 
-# write weather stats out to file
 def writeWeatherStats():
 
-    	f = open("/home/pi/SDL_Pi_SkyWeather/state/WeatherStats.txt", "w")
-	f.write(str(totalRain) + '\n') 
-	f.write(str(as3935LightningCount) + '\n')
-	f.write(str(as3935LastInterrupt) + '\n')
-	f.write(str(as3935LastDistance) + '\n')
-	f.write(str(as3935LastStatus) + '\n')
-	f.write(str(currentWindSpeed) + '\n')
-	f.write(str(currentWindGust) + '\n')
-	f.write(str(totalRain)  + '\n')
-	f.write(str(bmp180Temperature)  + '\n')
-	f.write(str(bmp180Pressure) + '\n')
-	f.write(str(bmp180Altitude) + '\n')
-	f.write(str(bmp180SeaLevel)  + '\n')
-	f.write(str(outsideTemperature) + '\n')
-	f.write(str(outsideHumidity) + '\n')
-	f.write(str(currentWindDirection) + '\n')
-	f.write(str(currentWindDirectionVoltage) + '\n')
-	f.write(str(HTUtemperature) + '\n')
-	f.write(str(HTUhumidity) + '\n')
-	f.close()
+	f = open("/home/pi/SDL_Pi_SkyWeather/state/WeatherStats.txt", "w")
+ 	f.write('Updated:,%s' % datetime.now() + '\n')
+	f.write('totalRain:,' + str(totalRain) + '\n') 
+	f.write('rain60Minutes:,' + str(rain60Minutes) + '\n') 
+	f.write('as3935LightningCount:,' + str(as3935LightningCount) + '\n') 
+	f.write('as3935LastInterrupt:,' + str(as3935LastInterrupt) + '\n')
+	f.write('aas3935LastDistance:,' + str(as3935LastDistance) + '\n')
+	f.write('as3935LastStatus:,' + str(as3935LastStatus) + '\n')
+ 	f.write('currentWindSpeed:,' + str(currentWindSpeed) + '\n')
+	f.write('currentWindGust:,' + str(currentWindGust) + '\n')
+	f.write('currentWindDirection:,' + str(currentWindDirection) + '\n')
+	f.write('currentWindDirectionVoltage:,' + str(currentWindDirectionVoltage) + '\n')
+  	f.write('bmp180Temperature:,' + str(bmp180Temperature)  + '\n')
+	f.write('bmp180Pressure:,' + str(bmp180Pressure) + '\n')
+	f.write('bmp180Altitude:,' + str(bmp180Altitude) + '\n')
+	f.write('bmp180SeaLevel:,' + str(bmp180SeaLevel)  + '\n')
+    	f.write('outsideTemperature:,' + str(outsideTemperature) + '\n')
+	f.write('outsideHumidity:,' + str(outsideHumidity) + '\n')
+										  
+	f.write('HTUtemperature:,' + str(HTUtemperature) + '\n')
+	f.write('HTUhumidity:,' + str(HTUhumidity) + '\n')
+	f.write('SunlightUVIndex:,' + str(SunlightUVIndex) + '\n')
+        f.close()
+
+
+def readWeatherStats():
+	# I am only interested in reading stats that need to be preserved if the Pi Rebooted
+	global totalRain, rain60Minutes, as3935LightningCount
+	totalRain = 0
+	rain60Minutes = 0
+	as3935LightningCount = 0
+
+	print "Reading weather stats from file after a boot"
+	
+	try:
+		fr = open("/home/pi/SDL_Pi_SkyWeather/state/WeatherStats.txt", "r")
+		l = fr.readline() # I dont care for the date time stamp
+		l = fr.readline() # This should be totalRain
+		rl = l.split(',')[-1]
+		rl.replace('\n', '')
+		totalRain = float(rl)
+		l = fr.readline() # This should be rain60Minutes
+		rl = l.split(',')[-1]
+		rl.replace('\n', '')
+		rain60Minutes = float(rl)
+		l = fr.readline() # This should be as3935LightningCount
+		rl = l.split(',')[-1]
+		rl.replace('\n', '')
+		as3935LightningCount = float(rl)
+		# The rest of the variables dont need to be preserved, as they will be sampled straight away
+		fr.close()
+	except:
+        	print("Unexpected error reading weatherstats file - but we will continue on:", sys.exc_info()[0])
+
+def newdayClearStats():
+
+	global totalRain, as3935LightningCount
+	totalRain = 0
+	as3935LightningCount = 0
+	writeWeatherStats()
+	print "**** New Day - reset daily totals ****"
 
 
 
@@ -1824,6 +1864,7 @@ currentWindDirectionVoltage = 0.0
 rain60Minutes = 0.0
 
 #as3935Interrupt = False
+readWeatherStats()
 
 pclogging.log(pclogging.INFO, __name__, "SkyWeather Startup Version"+config.SWVERSION )
 
@@ -1873,6 +1914,8 @@ scheduler.add_job(tick, 'interval', seconds=60)
 
 scheduler.add_job(sampleAndDisplay, 'interval', seconds=30)
 scheduler.add_job(patTheDog, 'interval', seconds=10)   # reset the WatchDog Timer
+scheduler.add_job(writeWeatherStats, 'interval', seconds=30)
+scheduler.add_job(newdayClearStats, 'cron', hour=0, minute=0) # Resetting daily totals - could change this to 9am
 
 # every minute, check for button changes
 scheduler.add_job(checkForButtons, 'interval', seconds=600)   
