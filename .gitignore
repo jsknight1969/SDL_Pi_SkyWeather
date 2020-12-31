@@ -7,9 +7,8 @@ tx*
 nohup.out
 .*DS_Store
 conflocal.py
-state/EnglishMetric.txt
+state/*.txt
 static/SkyCamera.py
 static/*.jpg
 static/*.png
 *.log
-state/WeatherStats.txt
