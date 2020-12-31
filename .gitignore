@@ -12,3 +12,4 @@ static/SkyCamera.py
 static/*.jpg
 static/*.png
 *.log
+state/WeatherStats.txt
