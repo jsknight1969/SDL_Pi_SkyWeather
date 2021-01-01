@@ -17,9 +17,7 @@ import sys
 sys.path.append('../Adafruit_ADS1x15')
 sys.path.append('../')
 
-import config
-
-import SDL_Pi_WeatherRack as SDL_Pi_WeatherRack
+import SDL_Pi_WeatherRack
 
 #
 # GPIO Numbering Mode GPIO.BCM

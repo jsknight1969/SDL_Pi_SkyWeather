@@ -23,7 +23,7 @@ try:
 
 
 except:
-	import NoWPAConfig.py as config	
+	import NoWPAConfig as config	
 
 import sys
 import time as time_
