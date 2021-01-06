@@ -4,10 +4,13 @@
 #from constants import lookupTable1, lookupTable2
 #from constants import BME680Data
 #import constants
-import math
-import time
+#import math
+#import time
+from time import sleep
+from math import copysign
 
-__version__ = '1.0.5'
+
+__version__ = '1.0.5-sk'
 
 """BME680 constants, structures and utilities."""
 
@@ -470,7 +473,8 @@ class BME680(BME680Data):
     def soft_reset(self):
         """Trigger a soft reset."""
         self._set_regs(SOFT_RESET_ADDR, SOFT_RESET_CMD)
-        time.sleep(RESET_PERIOD / 1000.0)
+        #time.sleep(RESET_PERIOD / 1000.0)
+        sleep(RESET_PERIOD / 1000.0 )
 
     def set_temp_offset(self, value):
         """Set temperature offset in celsius.
@@ -482,7 +486,8 @@ class BME680(BME680Data):
         if value == 0:
             self.offset_temp_in_t_fine = 0
         else:
-            self.offset_temp_in_t_fine = int(math.copysign((((int(abs(value) * 100)) << 8) - 128) / 5, value))
+            #self.offset_temp_in_t_fine = int(math.copysign((((int(abs(value) * 100)) << 8) - 128) / 5, value))
+            self.offset_temp_in_t_fine = int(copysign((((int(abs(value) * 100)) << 8) - 128) / 5, value))
 
     def set_humidity_oversample(self, value):
         """Set humidity oversampling.
@@ -644,7 +649,10 @@ class BME680(BME680Data):
         self._set_bits(CONF_T_P_MODE_ADDR, MODE_MSK, MODE_POS, value)
 
         while blocking and self.get_power_mode() != self.power_mode:
-            time.sleep(POLL_PERIOD_MS / 1000.0)
+            #time.sleep(POLL_PERIOD_MS / 1000.0)
+            sleep(POLL_PERIOD_MS / 1000.0)
+            
+            
 
     def get_power_mode(self):
         """Get power mode."""
@@ -663,7 +671,8 @@ class BME680(BME680Data):
             status = self._get_regs(FIELD0_ADDR, 1)
 
             if (status & NEW_DATA_MSK) == 0:
-                time.sleep(POLL_PERIOD_MS / 1000.0)
+                #time.sleep(POLL_PERIOD_MS / 1000.0)
+                sleep(POLL_PERIOD_MS / 1000.0)
                 continue
 
             regs = self._get_regs(FIELD0_ADDR, FIELD_LENGTH)

@@ -39,6 +39,7 @@ def platform_detect():
     # TODO: Check the Beaglebone Black /proc/cpuinfo value instead of reading
     # the platform.
     plat = platform.platform()
+    print("Platform-X: ", plat)
     if plat.lower().find('armv7l-with-debian') > -1:
         return BEAGLEBONE_BLACK
     elif plat.lower().find('armv7l-with-ubuntu') > -1:
@@ -91,20 +92,23 @@ def pi_version():
     with open('/proc/cpuinfo', 'r') as infile:
         cpuinfo = infile.read()
     # Match a line like 'Hardware   : BCM2709'
-    match = re.search('^Hardware\s+:\s+(\w+)$', cpuinfo,
-                      flags=re.MULTILINE | re.IGNORECASE)
+    match = re.search('^Hardware\s+:\s+(\w+)$', cpuinfo, flags=re.MULTILINE | re.IGNORECASE)
     if not match:
         # Couldn't find the hardware, assume it isn't a pi.
         return None
     if match.group(1) == 'BCM2708':
         # Pi 1
         return 1
-    elif match.group(1) == 'BCM2709':
+    elif match.group(1) == 'BCM2709': 
         # Pi 2
         return 2
     elif match.group(1) == 'BCM2835':
         # Pi 3 / Pi on 4.9.x kernel
         return 3
+    elif match.group(1) == 'BCM2711':
+        # Pi 4 / Pi on 4.9.x kernel
+        print ("PI4")
+        return 4
     else:
         # Something else, not a pi.
         return None

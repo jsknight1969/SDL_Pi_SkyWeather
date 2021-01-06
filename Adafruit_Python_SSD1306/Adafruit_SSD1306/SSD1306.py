@@ -22,8 +22,9 @@ from __future__ import division
 import logging
 import time
 
-import Adafruit_GPIO as GPIO
-import Adafruit_GPIO.SPI as SPI
+from Adafruit_Python_GPIO.Adafruit_GPIO import GPIO, SPI
+#import Adafruit_GPIO as GPIO
+#import Adafruit_GPIO.SPI as SPI
 
 
 # Constants

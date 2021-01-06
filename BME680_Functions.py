@@ -6,14 +6,15 @@ try:
 except ImportError:
     import config
 
-import sys
-import time
+#import sys
+#import time
 
-sys.path.append('./BME680')
+#sys.path.append('./BME680')
 
 
 
-import bme680 as BME680
+#import bme680 as BME680
+from BME680 import bme680 as BME680
 
 
 def setup_bme680(bme680):

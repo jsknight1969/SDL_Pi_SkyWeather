@@ -19,7 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import Adafruit_GPIO.Platform as Platform
+#import Adafruit_GPIO.Platform as Platform
+from Adafruit_Python_GPIO.Adafruit_GPIO import Platform as Platform
 
 
 OUT     = 0
@@ -413,6 +414,9 @@ def get_platform_gpio(**keywords):
     returned GPIO object is an instance of BaseGPIO.
     """
     plat = Platform.platform_detect()
+    print("Platform : ", plat)
+    plat = Platform.RASPBERRY_PI
+    print("Platform : ", plat)
     if plat == Platform.RASPBERRY_PI:
         import RPi.GPIO
         return RPiGPIOAdapter(RPi.GPIO, **keywords)
