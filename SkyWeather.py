@@ -111,7 +111,7 @@ import SDL_Pi_GrovePowerDrive
 WLAN_check_flg = 0
 totalRain = 0
 rain60Minutes = 0
-ip = _func.get_ip()
+
 
 ################
 # Device Present State Variables
@@ -120,6 +120,12 @@ ip = _func.get_ip()
 #indicate interrupt has happened from as3936
 
 as3935_Interrupt_Happened = False
+# as3935 Set up Lightning Detector
+as3935LastInterrupt = 0
+as3935LightningCount = 0
+as3935LastDistance = 0
+as3935LastStatus = ""
+as3935Interrupt = False
 
 config.Camera_Present = False
 config.TCA9545_I2CMux_Present = False
@@ -514,7 +520,7 @@ print ("BME680: ", config.BME680_Present)
 ################
 def process_as3935_interrupt():
     global as3935Interrupt, as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus
-    print("Processing interrupt from as3935")
+    if (config.SWDEBUG): print("Processing interrupt from as3935")
     #as3935Interrupt = False
     # turn I2CBus 1 on for low loading
     if (config.TCA9545_I2CMux_Present): tca9545.write_control_register(TCA9545_CONFIG_BUS1)
@@ -561,12 +567,6 @@ def process_as3935_interrupt():
 
 
 
-# as3935 Set up Lightning Detector
-as3935LastInterrupt = 0
-as3935LightningCount = 0
-as3935LastDistance = 0
-as3935LastStatus = ""
-as3935Interrupt = False
 
 
 
@@ -597,11 +597,11 @@ try:
 	as3935.set_spike_detection(SpikeDetection)
 	config.AS3935_Present = True
 	print("as3935 present at 0x02")
-	#process_as3935_interrupt()
+	process_as3935_interrupt()
 	if (config.TCA9545_I2CMux_Present): tca9545.write_control_register(TCA9545_CONFIG_BUS1)
 
 except IOError as e:
-    print("I/O error({0}): {1}".format(e.errno, e.strerror))
+    print(e)
     as3935 = RPi_AS3935(address=0x03, bus=1)
     try:
         as3935.set_noise_floor(NoiseFloor)
@@ -614,7 +614,7 @@ except IOError as e:
         #print "as3935 present"
 
     except IOError as e:
-        print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        print(e)
         config.AS3935_Present = False
 
 
@@ -648,7 +648,7 @@ def handle_as3935_interrupt(channel):
         I2C_Lock.acquire()
         process_as3935_interrupt()
     except IOError as e:
-        print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        print(e)
         print("exception - as3935 I2C did not work")
 
     I2C_Lock.release()
@@ -1470,7 +1470,6 @@ def checkForButtons():
 def func_wundergroud():
     if (config.SWDEBUG):
         print("------ Running Weather Underground ------")
-        updateBlynk.blynkStatusTerminalUpdate("Updated sent to WUnderground")
         print("--Sending Data to WeatherUnderground--")
     # continue with send to WeatherUnderground
     try:
@@ -1557,7 +1556,7 @@ if (config.enable_mail):
 	solarVoltage = 0
 	solarCurrent = 0
 	subjectText = "The "+ config.STATIONKEY + " SkyWeather Raspberry Pi has #rebooted."
-	bodyText = "SkyWeather Version "+config.SWVERSION+ " Startup \n"+ip+"\n"
+	bodyText = "SkyWeather Version %s" % config.SWVERSION
 	if (config.SunAirPlus_Present):
 		sampleSunAirPlus()
 		bodyText = bodyText + "\n" + "BV=%0.2fV/BC=%0.2fmA/SV=%0.2fV/SC=%0.2fmA" % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent)
@@ -1687,22 +1686,9 @@ if (config.SWDEBUG): print ("Starting scheduler")
 scheduler.start()
 
 while True:
+    if (as3935Interrupt):
+        process_as3935_interrupt()
+        as3935Interrupt = False
 	
-	# process Interrupts from Lightning
-# 	if (as3935Interrupt == True):
-# 		try:
-# 			print("AS3935 Interrupt")
-# 			I2C_Lock.acquire()
-# 			process_as3935_interrupt()
-# 		except IOError as e:
-# 			print("I/O error({0}): {1}".format(e.errno, e.strerror))
-# 			print("exception - as3935 I2C did not work")
-        
-# 		I2C_Lock.release()
-
-#         # 	if (config.TCA9545_I2CMux_Present):
-#         #         	tca9545.write_control_register(TCA9545_CONFIG_BUS0)
-	
-# as3935Interrupt = False
 	time.sleep(1.0)
 

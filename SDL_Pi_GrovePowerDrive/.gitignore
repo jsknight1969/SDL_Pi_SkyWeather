@@ -6,3 +6,5 @@ tx*
 *.temp
 *.test
 nohup.out
+*.log
+
