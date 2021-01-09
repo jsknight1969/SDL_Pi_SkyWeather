@@ -4,12 +4,12 @@
 
 import time
 
-import Adafruit_GPIO.SPI as SPI
-import Adafruit_SSD1306
+from Adafruit_Python_GPIO.Adafruit_GPIO import SPI
+from Adafruit_Python_SSD1306.Adafruit_SSD1306 import SSD1306
+#import Adafruit_GPIO.SPI as SPI
+#import Adafruit_SSD1306
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 OLEDLines = ["","","","","",""]
 width = 128

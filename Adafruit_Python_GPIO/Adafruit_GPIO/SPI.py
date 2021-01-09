@@ -22,7 +22,7 @@
 import operator
 import time
 
-import Adafruit_GPIO as GPIO
+from Adafruit_Python_GPIO.Adafruit_GPIO import GPIO
 
 
 MSBFIRST = 0

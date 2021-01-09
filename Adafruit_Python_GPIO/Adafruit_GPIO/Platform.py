@@ -31,33 +31,30 @@ def platform_detect():
     """Detect if running on the Raspberry Pi or Beaglebone Black and return the
     platform type.  Will return RASPBERRY_PI, BEAGLEBONE_BLACK, or UNKNOWN."""
     # Handle Raspberry Pi
+    _return = UNKNOWN
     pi = pi_version()
     if pi is not None:
-        return RASPBERRY_PI
+        _return = RASPBERRY_PI
 
     # Handle Beaglebone Black
     # TODO: Check the Beaglebone Black /proc/cpuinfo value instead of reading
     # the platform.
-    plat = platform.platform()
-    print("Platform-X: ", plat)
-    if plat.lower().find('armv7l-with-debian') > -1:
-        return BEAGLEBONE_BLACK
-    elif plat.lower().find('armv7l-with-ubuntu') > -1:
-        return BEAGLEBONE_BLACK
-    elif plat.lower().find('armv7l-with-glibc2.4') > -1:
-        return BEAGLEBONE_BLACK
-        
-    # Handle Minnowboard
-    # Assumption is that mraa is installed
-    try: 
-        import mraa 
-        if mraa.getPlatformName()=='MinnowBoard MAX':
-            return MINNOWBOARD
-    except ImportError:
-        pass
+    else:
+        plat = platform.platform()
+        if plat.lower().find('armv7l') > -1: 
+            _return = BEAGLEBONE_BLACK
+        else:
+            # Handle Minnowboard
+            # Assumption is that mraa is installed
+            try: 
+                import mraa 
+                if mraa.getPlatformName()=='MinnowBoard MAX':
+                    _return = MINNOWBOARD
+            except ImportError:
+                pass
     
     # Couldn't figure out the platform, just return unknown.
-    return UNKNOWN
+    return _return
 
 
 def pi_revision():
@@ -106,8 +103,7 @@ def pi_version():
         # Pi 3 / Pi on 4.9.x kernel
         return 3
     elif match.group(1) == 'BCM2711':
-        # Pi 4 / Pi on 4.9.x kernel
-        print ("PI4")
+        # Pi 4 
         return 4
     else:
         # Something else, not a pi.

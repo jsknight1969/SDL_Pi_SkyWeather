@@ -36,22 +36,20 @@ import re
 import math
 import os
 import threading
-import commands
 import sendemail
 import logging
 logging.basicConfig()
 
+#functions
+import SkyWeather_functions as _func
 
 
 sys.path.append('./TSL2591')
 #sys.path.append('./SDL_Pi_SI1145')
 #sys.path.append('./SDL_Pi_TCA9545')
-
-sys.path.append('./SDL_Pi_SSD1306')
 #sys.path.append('./Adafruit_Python_SSD1306')
 #sys.path.append('./RTC_SDL_DS3231')
 #sys.path.append('./Adafruit_Python_BMP')
-sys.path.append('./Adafruit_Python_GPIO')
 sys.path.append('./SDL_Pi_WeatherRack')
 #sys.path.append('./RaspberryPi-AS3935/RPi_AS3935')
 sys.path.append('./SDL_Pi_INA3221')
@@ -93,8 +91,7 @@ import BME680_Functions
 from RPi_AS3935 import RPi_AS3935 as RPi_AS3935
 #from RPi_AS3935 import RPi_AS3935
 #import Adafruit_SSD1306
-from Adafruit_Python_SSD1306.Adafruit_SSD1306 import SSD1306 as Adafruit_SSD1306
-import Scroll_SSD1306
+#from Adafruit_Python_SSD1306.Adafruit_SSD1306 import SSD1306 as Adafruit_SSD1306
 import WeatherUnderground
 import SDL_Pi_SI1145
 from SDL_Pi_SI1145 import SI1145Lux
@@ -114,6 +111,7 @@ import SDL_Pi_GrovePowerDrive
 WLAN_check_flg = 0
 totalRain = 0
 rain60Minutes = 0
+ip = _func.get_ip()
 
 ################
 # Device Present State Variables
@@ -189,25 +187,12 @@ except:
 
 print ("TCA9545 detection: ", config.TCA9545_I2CMux_Present)
 
-def initializeOLED():
-    try:
-        # Initialize library.
-        RST =27
-        display = Adafruit_SSD1306.SSD1306_128_64(rst=RST, i2c_address=0x3C)
-        display.begin()
-        display.clear()
-        display.display()
-        config.OLED_Present = True
-        config.OLED_Originally_Present = True
-    except:
-        config.OLED_Originally_Present = False
-        config.OLED_Present = False
-
 ################
 # OLED SSD_1306 Detection
+
 config.OLED_Originally_Present = False
 config.OLED_Present = False
-initializeOLED()
+config.OLED_Present = _func.initializeOLED()
 print ("OLED SSD_1306 detection: ", config.OLED_Present)
 
 def removePower(GroveSavePin):
@@ -1138,9 +1123,14 @@ def sampleAndDisplay():
     print("----------------- ")
     try:
         sampleWeather()
-        if (config.OLED_Present): writeOLED()
         if (config.DS3231_Present): writeDS3231()
-        if (config.AS3935_Present): displaylightning()
+        if (config.AS3935_Present): displayLightning()
+        if (config.OLED_Present):
+            _func.writetoOLED(("Wind Speed=\t%0.2f MPH")%(currentWindSpeed/1.6))
+            _func.writetoOLED(("Rain Total=\t%0.2f in")%(totalRain/25.4))
+            if (config.ADS1015_Present or config.ADS1115_Present):_func.writetoOLED(("Wind Dir=%0.2f Degrees" % weatherStation.current_wind_direction()))
+            if (config.DS3231_Present): _func.writetoOLED(("%s" % ds3231.read_datetime()))
+            if (config.HDC1080_Present): _func.writetoOLED(("InTemp = \t%0.2f C" % HTUtemperature))
         if (config.SWDEBUG == True):state.printState()
         if (config.USEBLYNK): updateBlynk.blynkStateUpdate()
     
@@ -1164,32 +1154,19 @@ def writeDS3231():
     print("DS3231 Temperature= \t%0.2f C" % ds3231.getTemp())
     print("----------------- ")
 
-def writeOLED():
-     Scroll_SSD1306.addLineOLED(display,  ("Wind Speed=\t%0.2f MPH")%(currentWindSpeed/1.6))
-     Scroll_SSD1306.addLineOLED(display,  ("Rain Total=\t%0.2f in")%(totalRain/25.4))
-     if (config.ADS1015_Present or config.ADS1115_Present):Scroll_SSD1306.addLineOLED(display,  "Wind Dir=%0.2f Degrees" % weatherStation.current_wind_direction())
-     if (config.DS3231_Present): Scroll_SSD1306.addLineOLED(display,"%s" % ds3231.read_datetime()) 
-     if (config.HDC1080_Present): Scroll_SSD1306.addLineOLED(display,  "InTemp = \t%0.2f C" % HTUtemperature)
-
-def writeOLEDLightning():
-    Scroll_SSD1306.addLineOLED(display, '')
-    Scroll_SSD1306.addLineOLED(display, '---LIGHTNING---')
-    Scroll_SSD1306.addLineOLED(display, '')
-
-def displaylightning():
+def displayLightning():
     global as3935, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, as3935LightningCount
-    print (" ----   Lightning statistics ------- ")
-    if (as3935LastInterrupt == 0x00): print("----No Lightning detected---")
-    if (as3935LastInterrupt == 0x01): print("Noise Floor: %s" % as3935LastStatus)
-    if (as3935LastInterrupt == 0x04): print("Disturber: %s" % as3935LastStatus)
     if (as3935LastInterrupt == 0x08): 
-        print("Lightning: %s" % as3935LastStatus)
-        if (config.OLED_Present): writeOLEDLightning()
+        if (config.OLED_Present): _func.displayLightningAlert()
         as3935LightningCount += 1
         as3935LastInterrupt = 0x00
+    print ("Lightning Status: %s " % as3935LastStatus)
+    print ("Lightning Count: %s" % as3935LightningCount)
+    if (config.OLED_Present): 
+        _func.writetoOLED("Lightning Status: %s " % as3935LastStatus) 
+        _func.writetoOLED("Lightning Count: %s" % as3935LightningCount)
+    
 
-    print("Lightning Count = %s" % as3935LightningCount)
-    print("----------------- ")
 
 def writeWeatherRecord():
     global as3935LightningCount
@@ -1487,7 +1464,7 @@ def checkForButtons():
     if (config.USEBLYNK): updateBlynk.blynkStatusUpdate()
     if ((state.runOLED == True) and (reinitializeOLED == True)):
         I2C_Lock.acquire()
-        initializeOLED()
+        display = _func.initializeOLED()
         I2C_Lock.release()
         
 def func_wundergroud():
@@ -1580,8 +1557,7 @@ if (config.enable_mail):
 	solarVoltage = 0
 	solarCurrent = 0
 	subjectText = "The "+ config.STATIONKEY + " SkyWeather Raspberry Pi has #rebooted."
-	ipAddress = commands.getoutput('hostname -I')
-	bodyText = "SkyWeather Version "+config.SWVERSION+ " Startup \n"+ipAddress+"\n"
+	bodyText = "SkyWeather Version "+config.SWVERSION+ " Startup \n"+ip+"\n"
 	if (config.SunAirPlus_Present):
 		sampleSunAirPlus()
 		bodyText = bodyText + "\n" + "BV=%0.2fV/BC=%0.2fmA/SV=%0.2fV/SC=%0.2fmA" % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent)

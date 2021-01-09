@@ -20,7 +20,7 @@ def stopFlash():
 def blynkInit():
     # initalize button states
     try:
-        print "Entering blynkInit debug mode: " + str(DEBUGBLYNK)
+        print("Entering blynkInit debug mode: " + str(DEBUGBLYNK))
  
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V5?value=0', timeout=10)
         if (state.runOLED == True):
@@ -47,17 +47,17 @@ def blynkInit():
             
         state.EnglishMetric = value
         if (DEBUGBLYNK):
-            print "state.EnglishMetric = ", value
+            print("state.EnglishMetric = ", value)
         if (state.EnglishMetric == 0):
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V8?value=0')
         else:        
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V8?value=1')
 
         if (DEBUGBLYNK):
-            print "Exiting blynkInit:"
+            print("Exiting blynkInit:")
 
     except Exception as e:
-        print "exception in blynkInit"
+        print("exception in blynkInit")
         print (e)
         return 0
 
@@ -65,7 +65,7 @@ def blynkResetButton(buttonNumber):
     try:
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/'+buttonNumber+'?value=0')
     except Exception as e:
-        print "exception in blynkResetButton"
+        print("exception in blynkResetButton")
         print (e)
         return 0
 
@@ -75,13 +75,13 @@ def blynkEventUpdate(Event):
         val = Event 
         put_body = json.dumps([val])
         if (DEBUGBLYNK):
-          print "blynkEventUpdate:",val
+          print("blynkEventUpdate:",val)
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V31', data=put_body, headers=put_header, timeout=10)
         if (DEBUGBLYNK):
-            print "blynkEventUpdate:POST:r.status_code:",r.status_code
+            print("blynkEventUpdate:POST:r.status_code:",r.status_code)
         return 1
     except Exception as e:
-        print "exception in blynkEventUpdate"
+        print("exception in blynkEventUpdate")
         print (e)
         return 0
 
@@ -92,12 +92,12 @@ def blynkStatusTerminalUpdate(entry):
         entry = time.strftime("%Y-%m-%d %H:%M:%S")+": "+entry+"\n"
         put_body = json.dumps([entry])
         if (DEBUGBLYNK):
-            print "blynkStateUpdate:Pre:put_body:",put_body
+            print("blynkStateUpdate:Pre:put_body:",put_body)
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V32', data=put_body, headers=put_header, timeout=10)
         if (DEBUGBLYNK):
-            print "blynkStateUpdate:POST:r.status_code:",r.status_code
+            print("blynkStateUpdate:POST:r.status_code:",r.status_code)
     except Exception as e:
-        print "exception in blynkTerminalUpdate"
+        print("exception in blynkTerminalUpdate")
         print (e)
         return 0
 
@@ -108,12 +108,12 @@ def blynkSolarMAXLine(entry, protocol):
 
         put_body = json.dumps([entry])
         if (DEBUGBLYNK):
-            print "blynkSolarMAXUpdate:Pre:put_body:",put_body
+            print("blynkSolarMAXUpdate:Pre:put_body:",put_body)
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V75', data=put_body, headers=put_header, timeout=10)
         if (DEBUGBLYNK):
-            print "blynkSolarMAXUpdate:POST:r.status_code:",r.status_code
+            print("blynkSolarMAXUpdate:POST:r.status_code:",r.status_code)
     except Exception as e:
-        print "exception in blynkSolarMAXUpdate"
+        print("exception in blynkSolarMAXUpdate")
         print (e)
         return 0
     
@@ -124,12 +124,12 @@ def blynkSolarTerminalUpdate(entry):
 
         put_body = json.dumps([entry])
         if (DEBUGBLYNK):
-            print "blynkStateUpdate:Pre:put_body:",put_body
+            print("blynkStateUpdate:Pre:put_body:",put_body)
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V33', data=put_body, headers=put_header, timeout=10)
         if (DEBUGBLYNK):
-            print "blynkStateUpdate:POST:r.status_code:",r.status_code
+            print("blynkStateUpdate:POST:r.status_code:",r.status_code)
     except Exception as e:
-        print "exception in blynkTerminalUpdate"
+        print("exception in blynkTerminalUpdate")
         print (e)
         return 0
     
@@ -139,7 +139,7 @@ def blynkUpdateImage():
 
     try:
         if (DEBUGBLYNK):
-             print "blynkUpdateImage:started"
+             print("blynkUpdateImage:started")
         """
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V70?value=2') # Picture URL
         if (DEBUGBLYNK):
@@ -160,7 +160,7 @@ def blynkUpdateImage():
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V70?urls=http://www.switchdoc.com/SkyWeatherNoAlpha.png', timeout=10) # Picture URL
 
     except Exception as e:
-        print "exception in blynkUpdateImage"
+        print("exception in blynkUpdateImage")
         print (e)
         return 0
 
@@ -181,10 +181,10 @@ def blynkStateUpdate():
         val = time.strftime("%Y-%m-%d %H:%M:%S")  
         put_body = json.dumps([val])
         if (DEBUGBLYNK):
-          print "blynkEventUpdate:",val
+          print("blynkEventUpdate:",val)
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V44', data=put_body, headers=put_header, timeout=20)
         if (DEBUGBLYNK):
-            print "blynkEventUpdate:POST:r.status_code:",r.status_code
+            print ("blynkEventUpdate:POST:r.status_code:",r.status_code)
 
         # do the graphs
 
@@ -192,10 +192,10 @@ def blynkStateUpdate():
         val = state.Outdoor_AirQuality_Sensor_Value 
         put_body = json.dumps([val])
         if (DEBUGBLYNK):
-            print "blynkStateUpdate:Pre:put_body:",put_body
+            print("blynkStateUpdate:Pre:put_body:",put_body)
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V7', data=put_body, headers=put_header, timeout=10)
         if (DEBUGBLYNK):
-            print "blynkStateUpdate:POST:r.status_code:",r.status_code
+            print("blynkStateUpdate:POST:r.status_code:",r.status_code)
     
 
         val = util.returnTemperatureCF(state.currentOutsideTemperature)
@@ -386,7 +386,7 @@ def blynkStateUpdate():
         # LEDs 
 
         if (DEBUGBLYNK):
-            print "BarometricTrend: ", state.barometricTrend
+            print ("BarometricTrend: ", state.barometricTrend)
             #if (state.barometricTrend):   #True is up, False is down
         if (state.barometricTrend == 0):
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?color=%23FFFFFF', timeout=10) #  White
@@ -396,24 +396,24 @@ def blynkStateUpdate():
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V42?color=%23FF0000', timeout=10) # red
 
         if (DEBUGBLYNK):
-                print "blynkBarometricTrendUpdate:OTHER:r.status_code:",r.status_code
+                print("blynkBarometricTrendUpdate:OTHER:r.status_code:",r.status_code)
 
-        print "lightning at: ", state.currentAs3935LastLightningTimeStamp, " time: ", time.time() - state.currentAs3935LastLightningTimeStamp
+        print("lightning at: ", state.currentAs3935LastLightningTimeStamp, " time: ", time.time() - state.currentAs3935LastLightningTimeStamp)
         if (time.time() - state.currentAs3935LastLightningTimeStamp > 1800):
-            print "time elasped since last strike"
+            print("time elasped since last strike")
             state.currentAs3935LastLightningTimeStamp = 0
 
         if (state.currentAs3935LastLightningTimeStamp == 0):   #True is lightning, False is none
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?color=%2300FF00', timeout=10) # Green
             if (DEBUGBLYNK):
-                print "blynkAlarmUpdate:OTHER:r.status_code:",r.status_code
+                print("blynkAlarmUpdate:OTHER:r.status_code:",r.status_code)
         else:
             r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V43?color=%23FF0000', timeout=10) # red
 
 
         return 1
     except Exception as e:
-        print "exception in blynkStateUpdate"
+        print("exception in blynkStateUpdate")
         print(traceback.format_exc())
         print (e)
         return 0
@@ -421,21 +421,21 @@ def blynkStateUpdate():
 def blynkStatusUpdate():
 
     if (DEBUGBLYNK):
-        print "blynkStatusUpdate Entry"
+        print("blynkStatusUpdate Entry")
     try:
         put_header={"Content-Type": "application/json"}
 
         # look for English or Metric 
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/get/V8') # read button state
         if (DEBUGBLYNK):
-            print "blynkStatusUpdate:POSTEM:r.status_code:",r.status_code
-            print "blynkStatusUpdate:POSTEM:r.text:",r.text
+            print("blynkStatusUpdate:POSTEM:r.status_code:",r.status_code)
+            print("blynkStatusUpdate:POSTEM:r.text:",r.text)
     
         if (r.text == '["1"]'):
             if (state.EnglishMetric == 0):
                 state.EnglishMetric = 1
                 if (DEBUGBLYNK):
-                    print "blynkStatusUpdate:POSTBRC:state.EnglishMetric set to Metric"
+                    print("blynkStatusUpdate:POSTBRC:state.EnglishMetric set to Metric")
                 blynkStatusTerminalUpdate("Set to Metric Units ")
                 f = open("/home/pi/SDL_Pi_SkyWeather/state/EnglishMetric.txt", "w")
                 f.write("1")
@@ -448,27 +448,27 @@ def blynkStatusUpdate():
                 f.write("0")
                 f.close()
                 if (DEBUGBLYNK):
-                    print "blynkStatusUpdate:POSTBRC:state.EnglishMetric set to English"
+                    print("blynkStatusUpdate:POSTBRC:state.EnglishMetric set to English")
                 blynkStatusTerminalUpdate("Set to English Units ")
 
 
         # look for rainbow button change
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/get/V5') # read button state
         if (DEBUGBLYNK):
-            print "blynkStatusUpdate:POSTBR:r.status_code:",r.status_code
-            print "blynkStatusUpdate:POSTBR:r.text:",r.text
+            print("blynkStatusUpdate:POSTBR:r.status_code:",r.status_code)
+            print ("blynkStatusUpdate:POSTBR:r.text:",r.text)
     
         if (r.text == '["1"]'):
             state.runRainbow = True
             blynkStatusTerminalUpdate("Turning Rainbow On ")
             if (DEBUGBLYNK):
-                print "blynkStatusUpdate:POSTBRC:state.runRainbow set to True"
+                print("blynkStatusUpdate:POSTBRC:state.runRainbow set to True")
         else:
             if(state.runRainbow == True):
                 blynkStatusTerminalUpdate("Turning Rainbow Off ")
             state.runRainbow = False
             if (DEBUGBLYNK):
-                print "blynkStatusUpdate:POSTBRC:state.runRainbow set to False"
+                print("blynkStatusUpdate:POSTBRC:state.runRainbow set to False")
 
                 
         # turn OLED ON and OFF 
@@ -480,7 +480,7 @@ def blynkStatusUpdate():
                 state.runOLED = True
                 blynkStatusTerminalUpdate("Turning OLED On ")
                 if (DEBUGBLYNK):
-                    print "blynkStatusUpdate:POSTBRO:state.runOLED set to True"
+                    print("blynkStatusUpdate:POSTBRO:state.runOLED set to True")
 
                 if (config.OLED_Originally_Present == True):
                     config.OLED_Present = True 
@@ -491,7 +491,7 @@ def blynkStatusUpdate():
                 state.runOLED = False
                 
                 if (DEBUGBLYNK):
-                    print "blynkStatusUpdate:POSTBRO:state.runOLED set to False"
+                    print("blynkStatusUpdate:POSTBRO:state.runOLED set to False")
                 if (config.OLED_Originally_Present == True):
                     config.OLED_Present = False 
                     util.turnOLEDOff()
@@ -499,18 +499,18 @@ def blynkStatusUpdate():
         # look for Flash Strip Command
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/get/V30') # read button state
         if (DEBUGBLYNK):
-            print "blynkStatusUpdate:POSTBF:r.status_code:",r.status_code
-            print "blynkStatusUpdate:POSTBF:r.text:",r.text
+            print("blynkStatusUpdate:POSTBF:r.status_code:",r.status_code)
+            print("blynkStatusUpdate:POSTBF:r.text:",r.text)
    
         
         if (r.text == '["1"]'):
             state.flashStrip = True
             if (DEBUGBLYNK):
-                print "blynkStatusUpdate:POSTBRF:state.flashStrip set to True"
+                print("blynkStatusUpdate:POSTBRF:state.flashStrip set to True")
         else:
             state.flashStrip = False
             if (DEBUGBLYNK):
-                print "blynkStatusUpdate:POSTBRF:state.flashStrip set to False"
+                print("blynkStatusUpdate:POSTBRF:state.flashStrip set to False")
 
 
 
@@ -520,7 +520,7 @@ def blynkStatusUpdate():
 
         return 1
     except Exception as e:
-        print "exception in blynkStatusUpdate"
+        print("exception in blynkStatusUpdate")
         print (e)
         return 0
 
@@ -531,10 +531,10 @@ def blynkSGSAppOnline():
     try:
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/isAppConnected')
         if (DEBUGBLYNK):
-            print "blynkSGSAppOnline:POSTCHECK:r.text:",r.text
+            print("blynkSGSAppOnline:POSTCHECK:r.text:",r.text)
         return r.text
     except Exception as e:
-        print "exception in blynkApponline"
+        print("exception in blynkApponline")
         print (e)
         return ""
 

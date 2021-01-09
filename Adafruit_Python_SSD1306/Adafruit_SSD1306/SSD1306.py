@@ -102,7 +102,8 @@ class SSD1306Base(object):
             self._i2c = i2c.get_i2c_device(i2c_address)
         else:
             self._log.debug('Using hardware I2C with platform I2C provider.')
-            import Adafruit_GPIO.I2C as I2C
+            #import Adafruit_Python_GPIO.I2C as I2C
+            from Adafruit_Python_GPIO.Adafruit_GPIO import I2C
             if i2c_bus is None:
                 self._i2c = I2C.get_i2c_device(i2c_address)
             else:
