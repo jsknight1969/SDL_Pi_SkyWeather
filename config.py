@@ -73,25 +73,6 @@ AS3935_Lightning_Config = [2,1,3,0,3,3]
 # for barometeric pressure - needed to calculate sealevel equivalent - set your weatherstation elevation here
 BMP280_Altitude_Meters = 328.0
 
-# device present global variables
-Camera_Present = False
-TCA9545_I2CMux_Present = False
-SunAirPlus_Present = False
-AS3935_Present = False
-DS3231_Present = False
-BMP280_Present = False
-BME680_Present = False
-HDC1080_Present = False
-SHT30_Present = False
-AM2315_Present = False
-ADS1015_Present = False
-ADS1115_Present = False
-OLED_Present = False
-OLED_Originally_Present = False
-WXLink_Present = False
-Sunlight_Present = False
-TSL2591_Present = False
-
 #set this to true if you have the sensor, false if you do not
 DustSensor_Present = True
 
