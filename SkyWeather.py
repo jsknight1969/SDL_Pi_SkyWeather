@@ -36,6 +36,9 @@ logging.basicConfig()
 
 #functions
 import SkyWeather_functions as _func
+import SkyWeather_Functions_Rain as _rain
+_rain.SWDEBUG = SWDEBUG
+_rain.config = config
 _func.SWDEBUG = SWDEBUG
 _func.config = config
 
@@ -146,7 +149,6 @@ WXLink_LastMessageID = 0
 #globals
 currentWindSpeed = 0
 currentWindGust = 0
-totalRain = 0
 outsideTemperature = 0
 outsideHumidity = 0
 crc_check = 0
@@ -158,8 +160,7 @@ SunlightUV = 0
 SunlightUVIndex = 0
 HTUtemperature = 0
 HTUhumidity = 0
-rain60Minutes = 0
-totalRain = 0
+
 
 #indicate interrupt has happened from as3936
 as3935_Interrupt_Happened = False
