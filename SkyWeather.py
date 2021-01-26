@@ -49,19 +49,19 @@ if (config.enableText):
     _func.txtAddress = config.textnotifyAddress
 
 
-sys.path.append('./TSL2591')
+#sys.path.append('./TSL2591')
 #sys.path.append('./SDL_Pi_SI1145')
 #sys.path.append('./SDL_Pi_TCA9545')
 #sys.path.append('./Adafruit_Python_SSD1306')
 #sys.path.append('./RTC_SDL_DS3231')
 #sys.path.append('./Adafruit_Python_BMP')
-sys.path.append('./SDL_Pi_WeatherRack')
+#sys.path.append('./SDL_Pi_WeatherRack')
 #sys.path.append('./RaspberryPi-AS3935/RPi_AS3935')
-sys.path.append('./SDL_Pi_INA3221')
-sys.path.append('./graphs')
-sys.path.append('./SDL_Pi_HDC1000')
-sys.path.append('./SDL_Pi_AM2315')
-sys.path.append('./SDL_Pi_SHT30')
+#sys.path.append('./SDL_Pi_INA3221')
+#sys.path.append('./graphs')
+#sys.path.append('./SDL_Pi_HDC1000')
+#sys.path.append('./SDL_Pi_AM2315')
+#sys.path.append('./SDL_Pi_SHT30')
 #sys.path.append('./BME680')
 #sys.path.append('./MD503')
 #sys.path.append('./SDL_Pi_GrovePowerDrive')
@@ -72,24 +72,32 @@ import state
 import subprocess
 import RPi.GPIO as GPIO
 import doAllGraphs
+doAllGraphs.config = config
+
 import smbus
 import struct
-import SDL_Pi_HDC1000
+#import SDL_Pi_HDC1000
 from apscheduler.schedulers.background import BackgroundScheduler
 import apscheduler.events
 if (config.enable_MySQL_Logging == True):
 	import MySQLdb as mdb
 import picamera
+
 import SkyCamera
 import DustSensor
 import util
-import SDL_Pi_INA3221
+#import SDL_Pi_INA3221
+from SDL_Pi_HDC1000 import SDL_Pi_HDC1000
+from SDL_Pi_INA3221 import SDL_Pi_INA3221
 from RTC_SDL_DS3231 import SDL_DS3231
 #import SDL_DS3231
 from Adafruit_Python_BMP.Adafruit_BMP.BMP280 import BMP280
 #import Adafruit_BMP.BMP280 as BMP280
-#import SDL_Pi_WeatherRack as SDL_Pi_WeatherRack
+
 from SDL_Pi_WeatherRack import SDL_Pi_WeatherRack
+SDL_Pi_WeatherRack.SWDEBUG = SWDEBUG
+SDL_Pi_WeatherRack.config = config
+
 from BME680 import bme680 as BME680
 #import bme680 as BME680
 import BME680_Functions
@@ -112,6 +120,7 @@ from SDL_Pi_TCA9545 import SDL_Pi_TCA9545
 #import AirQualitySensorLibrary as AirQualitySensorLibrary
 #from MADS1x15 import ADS1x15
 from SDL_Pi_GrovePowerDrive import SDL_Pi_GrovePowerDrive
+
 
 
 ################
@@ -472,9 +481,14 @@ SDL_MODE_SAMPLE = 0
 SDL_MODE_DELAY = 1
 # turn I2CBus 0 on
 if (TCA9545_I2CMux_Present): tca9545.write_control_register(TCA9545_CONFIG_BUS0)
-weatherStation = SDL_Pi_WeatherRack.SDL_Pi_WeatherRack(config.anemometerPin, config.rainPin, 0,0, SDL_MODE_I2C_ADS1015)
-weatherStation.setWindMode(SDL_MODE_SAMPLE, 5.0)
-
+weatherStation = None
+try:
+    weatherStation = SDL_Pi_WeatherRack.SDL_Pi_WeatherRack(config.anemometerPin, config.rainPin, 0,0, SDL_MODE_I2C_ADS1015)
+    weatherStation.setWindMode(SDL_MODE_SAMPLE, 5.0)
+except Exception as e:
+    if (SWDEBUG):
+        print(e)
+        print("Weather rack issue!!!!")
 #weatherStation.setWindMode(SDL_MODE_DELAY, 5.0)
 
 
@@ -883,15 +897,15 @@ def sampleWeather():
     
     if (TCA9545_I2CMux_Present): tca9545.write_control_register(TCA9545_CONFIG_BUS0)
     SDL_INTERRUPT_CLICKS = 1
-    
-    if ((WXLink_Present) or ((SolarMax_Present) and (WXLink_Present) and (Dual_MAX_WXLink))):
+    #if ((config.WXLink_Present == False) or ((config.SolarMAX_Present == True) and (config.WXLink_Present == True) and (config.Dual_MAX_WXLink == False))):
+    if (not (WXLink_Present) or ((SolarMax_Present) and (WXLink_Present) and not (Dual_MAX_WXLink))):
         currentWindSpeed = weatherStation.current_wind_speed()
         currentWindGust = weatherStation.get_wind_gust()
         totalRain = totalRain + weatherStation.get_current_rain_total()/SDL_INTERRUPT_CLICKS
-        if ((ADS1015_Present == True) or (ADS1115_Present == True)):
-            currentWindDirection = weatherStation.current_wind_direction()
-            currentWindDirectionVoltage = weatherStation.current_wind_direction_voltage()
-            if (SWDEBUG): print("Wind WX0: ", currentWindDirection, currentWindDirectionVoltage, currentWindSpeed, currentWindGust)
+        #if ((ADS1015_Present == True) or (ADS1115_Present == True)):
+        currentWindDirection = weatherStation.current_wind_direction()
+        currentWindDirectionVoltage = weatherStation.current_wind_direction_voltage()
+        if (SWDEBUG): print("Wind WX0: ", currentWindDirection, currentWindDirectionVoltage, currentWindSpeed, currentWindGust)
             
     if (WXLink_Present == True):
 		# WXLink Data Gathering
@@ -1165,7 +1179,7 @@ def sampleAndDisplay():
         if (OLED_Present):
             _func.writetoOLED(("Wind Speed=\t%0.2f MPH")%(currentWindSpeed/1.6))
             _func.writetoOLED(("Rain Total=\t%0.2f in")%(totalRain/25.4))
-            if (ADS1015_Present or ADS1115_Present):_func.writetoOLED(("Wind Dir=%0.2f Degrees" % weatherStation.current_wind_direction()))
+            _func.writetoOLED(("Wind Dir=%0.2f Degrees" % weatherStation.current_wind_direction()))
             if (DS3231_Present): _func.writetoOLED(("%s" % ds3231.read_datetime()))
             if (HDC1080_Present): _func.writetoOLED(("InTemp = \t%0.2f C" % HTUtemperature))
         if (SWDEBUG):state.printState()
@@ -1396,34 +1410,10 @@ def totalRainArray():
 	
 
 def rainRate():
-	# currentTR = totalRain
-	# global lastraintime
-	# currenttime = time.time()
-	# rainRateReset()
-	# if (lastraintime == 0):
-	# 	total = 0
-	# else:
-	# 	time_delta = (currenttime - lastraintime)
-	# 	total = 36000/time_delta * .01
-	# 	lastraintime = currenttime
-    global lastraincount
-    currentcount = weatherStation.get_current_rain_count()
-    total = (currentcount - lastraincount) * .01
-    print("Last count: %s" % lastraincount)
-    lastraincount = currentcount
-    print("Current Count: %s" % currentcount)
-    print("Rain Rate: %s" % total)
-    return total
+    _ratecurrent = weatherStation.get_rain_rate()
+    if (USEBLYNK): updateBlynk.blynkRainRate(_ratecurrent)
+    return _ratecurrent
 
-# def rainRateReset():
-# 	global lastraintime
-# 	lresetat = lastraintime + 300 
-# 	print 'lastraintime: %s' % lastraintime
-# 	print 'will update at: %s' % lresetat
-# 	print 'current: %s' % time.time()
-# 	if (lastraintime > 0) and (lresetat < time.time()):
-# 		print ".....resetting rain rate"
-# 		lastraintime = 0
 
 # print out faults inside events
 def ap_my_listener(event):
@@ -1578,10 +1568,12 @@ if (config.WeatherUnderground_Present): scheduler.add_job(func_wundergroud, 'int
 
 
 #5 minutes
+_5mins = 5*60
 if (config.enable_MySQL_Logging == True): #push to mysql
 	scheduler.add_job(writeWeatherRecord, 'interval', seconds=5*60)
 	scheduler.add_job(writePowerRecord, 'interval', seconds=5*60)
-scheduler.add_job(checkForShutdown, 'interval', seconds=5*60) #check for power shutdown 
+scheduler.add_job(checkForShutdown, 'interval', seconds=_5mins) #check for power shutdown 
+scheduler.add_job(rainRate, 'interval', seconds=_5mins)
 
 
 #15 minutes

@@ -14,16 +14,20 @@
 
 # imports
 
-try:
-	# Check for user imports
-	try:
-        	import conflocal as config
-	except ImportError:
-        	import config
+# try:
+# 	# Check for user imports
+# 	try:
+#         	import conflocal as config
+# 	except ImportError:
+#         	import config
 
 
-except:
-	from SDL_Pi_WeatherRack.NoWPAConfig import config
+# except:
+# 	from SDL_Pi_WeatherRack.NoWPAConfig import config
+
+SWDEBUG = False
+config = None
+
 
 from sys import *
 from time import sleep
@@ -33,6 +37,7 @@ from RPi import GPIO
 
 
 GPIO.setwarnings(False)
+
 
 # constants
 SDL_MODE_INTERNAL_AD = 0
@@ -104,6 +109,8 @@ class SDL_Pi_WeatherRack:
 	_currentRainMin = 0
 	_lastRainTime = 0
 	_ads1015 = 0
+	_rateRainCount = 0
+	
 
 	def __init__(self, pinAnem, pinRain, intAnem, intRain, ADMode ):
 		GPIO.setup(pinAnem, GPIO.IN)
@@ -223,7 +230,9 @@ class SDL_Pi_WeatherRack:
   
 	#def get current values
 	def get_current_rain_total(self):
+		if (SWDEBUG): print("RainCount: %s" % float(SDL_Pi_WeatherRack._currentRainCount))
 		rain_amount = 0.2794 * float(SDL_Pi_WeatherRack._currentRainCount)/SDL_RAIN_BUCKET_CLICKS
+		SDL_Pi_WeatherRack._rateRainCount += SDL_Pi_WeatherRack._currentRainCount
 		SDL_Pi_WeatherRack._currentRainCount = 0
 		return rain_amount
 
@@ -275,3 +284,9 @@ class SDL_Pi_WeatherRack:
 
 	def get_current_rain_count(self):
 		return SDL_Pi_WeatherRack._currentRainCount
+
+	def get_rain_rate(self):
+		_return = (0.2794 * float(SDL_Pi_WeatherRack._rateRainCount)/SDL_RAIN_BUCKET_CLICKS) * 20
+		SDL_Pi_WeatherRack._rateRainCount = 0
+		return _return
+

@@ -37,13 +37,13 @@ try:
     state.ll=pyrfm.getLL(conf)
 
     if state.ll.setOpModeSleep(True,True):
-	state.ll.setFiFo()
-	state.ll.setOpModeIdle()
-        state.ll.setModemConfig('Bw31_25Cr48Sf512');
-	#state.ll.setModemConfig('Bw125Cr45Sf128');
-	#state.ll.setPreambleLength(8)
-	state.ll.setFrequency(434.0)
-	state.ll.setTxPower(13)
+        state.ll.setFiFo()
+        state.ll.setOpModeIdle()
+        state.ll.setModemConfig('Bw31_25Cr48Sf512')
+        #state.ll.setModemConfig('Bw125Cr45Sf128')
+        #state.ll.setPreambleLength(8)
+        state.ll.setFrequency(434.0)
+        state.ll.setTxPower(13)
 	
         print('HW-Version: ', state.ll.getVersion())
         config.WXLink_Present = True

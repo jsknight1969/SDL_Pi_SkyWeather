@@ -4,19 +4,8 @@
 # SwitchDoc Labs March 30, 2015
 
 import sys
-sys.path.append('/home/pi/SDL_Pi_SkyWeather/graphs')
-
-# Check for user imports
-try:
-        import conflocal as config
-except ImportError:
-        import config
-
-
-import TemperatureHumidityGraph 
-import PowerCurrentGraph 
-import PowerVoltageGraph 
-import BarometerLightningGraph 
+from graphs import TemperatureHumidityGraph, PowerCurrentGraph, PowerVoltageGraph, BarometerLightningGraph
+config = None
 
 def doAllGraphs():
 

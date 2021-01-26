@@ -12,8 +12,9 @@ try:
 except ImportError:
                 import config
 
-
 DEBUGBLYNK = config.DEBUGBLYNK
+put_header={"Content-Type": "application/json"}
+
 def stopFlash():
         r = requests.get(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V30?value=0')
 
@@ -173,8 +174,6 @@ def blynkStateUpdate():
         
         blynkUpdateImage()
         
-        put_header={"Content-Type": "application/json"}
-
         # set last sample time 
         
         put_header={"Content-Type": "application/json"}
@@ -264,8 +263,13 @@ def blynkStateUpdate():
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V20', data=put_body, headers=put_header, timeout=10)
         
         #wind direction
-        val = "{0:0.0f}/".format(state.ScurrentWindDirection) + util.returnWindDirection(state.ScurrentWindDirection)
+        if (config.windnodegrees):
+            val =  "%s" % util.returnWindDirection(state.ScurrentWindDirection)
+        else:    
+            val = "{0:0.0f}/".format(state.ScurrentWindDirection) + util.returnWindDirection(state.ScurrentWindDirection)
+
         put_body = json.dumps([val])
+        if (config.DEBUGBLYNK): print("Wind Direction: %s " % put_body)
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V2', data=put_body, headers=put_header, timeout=10)
 
         #rain 
@@ -286,15 +290,7 @@ def blynkStateUpdate():
         put_body = json.dumps([tval])
         r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V14', data=put_body, headers=put_header, timeout=10)
 
-        #rain rate
-        # val = "{0:0.2f}".format(state.currentRain60Minutes)
-        if (state.EnglishMetric == 1):
-            tval = "{0:0.2f}mm".format(state.currentRainRate) 
-        else:
-            tval = "{0:0.2f}in".format(state.currentRainRate / 25.4) 
-        put_body = json.dumps([tval])
-        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V15', data=put_body, headers=put_header, timeout=10)
-
+        
         #Sunlight 
         val = "{0:0.0f}".format(state.currentSunlightVisible) 
         #print ("Sunlight Val = ", state.currentSunlightVisible)
@@ -538,4 +534,11 @@ def blynkSGSAppOnline():
         print (e)
         return ""
 
+
+def blynkRainRate(_value):
+    #rain rate
+        # val = "{0:0.2f}".format(state.currentRain60Minutes)
+        tval = "{0:0.2f}in".format(state.currentRainRate / 25.4) 
+        put_body = json.dumps([tval])
+        r = requests.put(config.BLYNK_URL+config.BLYNK_AUTH+'/update/V15', data=put_body, headers=put_header, timeout=10)
    
